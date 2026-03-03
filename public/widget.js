@@ -42,8 +42,8 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        width: 60px;
-        height: 60px;
+        width: 62px;
+        height: 62px;
         border-radius: 50%;
         background: ${primary};
         border: none;
@@ -51,15 +51,27 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.28);
         z-index: 99998;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
       #echo-launcher:hover {
         transform: scale(1.08);
-        box-shadow: 0 6px 28px rgba(0,0,0,0.32);
+        box-shadow: 0 6px 28px rgba(0,0,0,0.36);
       }
       #echo-launcher svg { pointer-events: none; }
+      .echo-orbit-ring {
+        animation: echo-orbit-spin 6s linear infinite;
+        transform-origin: 25px 25px;
+      }
+      .echo-orbit-dot {
+        animation: echo-orbit-spin 3s linear infinite reverse;
+        transform-origin: 25px 25px;
+      }
+      @keyframes echo-orbit-spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
 
       #echo-widget {
         position: fixed;
@@ -105,11 +117,11 @@
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.12);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        flex-shrink: 0;
       }
       #echo-header h3 {
         margin: 0;
@@ -178,15 +190,15 @@
       }
 
       .echo-msg-avatar {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: ${primary};
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 13px;
         flex-shrink: 0;
+        overflow: hidden;
       }
 
       .echo-typing span {
@@ -349,19 +361,27 @@
     const brandLine = cfg.brand_line || 'AI Assistant';
 
     const wrapper = document.createElement('div');
+    // Orbit SVG — DGC ECHO brand logo, reused in launcher + message avatars
+    const orbitSVG = (size) => `
+      <svg width="${size}" height="${size}" viewBox="0 0 50 50" fill="none">
+        <circle cx="25" cy="25" r="19" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
+        <circle cx="25" cy="25" r="5" fill="#ffffff"/>
+        <ellipse cx="25" cy="25" rx="13" ry="8" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.8"
+          transform="rotate(-25 25 25)" class="echo-orbit-ring"/>
+        <circle cx="38" cy="25" r="2.8" fill="#7db8e8" class="echo-orbit-dot"/>
+      </svg>`;
+
     wrapper.innerHTML = `
       <!-- Launcher button -->
       <button id="echo-launcher" aria-label="Open chat">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        ${orbitSVG(30)}
       </button>
 
       <!-- Chat panel -->
       <div id="echo-widget" role="dialog" aria-label="${name} chat" aria-hidden="true">
         <div id="echo-header">
           <div id="echo-header-left">
-            <div class="echo-avatar">💬</div>
+            <div class="echo-avatar">${orbitSVG(26)}</div>
             <div>
               <h3>${name}</h3>
               <p>${brandLine}</p>
@@ -431,7 +451,7 @@
       el.className = `echo-msg echo-${who}`;
       if (who === 'bot') {
         el.innerHTML = `
-          <div class="echo-msg-avatar">💬</div>
+          <div class="echo-msg-avatar">${orbitSVG(28)}</div>
           <div class="echo-bubble">${renderMarkdown(text)}</div>`;
       } else {
         el.innerHTML = `<div class="echo-bubble">${renderMarkdown(text)}</div>`;
@@ -446,7 +466,7 @@
       el.className = 'echo-msg echo-bot';
       el.id = 'echo-typing-indicator';
       el.innerHTML = `
-        <div class="echo-msg-avatar">💬</div>
+        <div class="echo-msg-avatar">${orbitSVG(28)}</div>
         <div class="echo-bubble echo-typing"><span></span><span></span><span></span></div>`;
       messagesEl.appendChild(el);
       messagesEl.scrollTop = messagesEl.scrollHeight;
