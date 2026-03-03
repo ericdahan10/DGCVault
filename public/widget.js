@@ -322,10 +322,14 @@
       #echo-quick-replies {
         padding: 8px 16px 4px;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 6px;
         background: ${msgAreaBg};
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
       }
+      #echo-quick-replies::-webkit-scrollbar { display: none; }
       .echo-qr-btn {
         background: ${qrBg};
         border: 1px solid ${qrBorder};
@@ -335,7 +339,8 @@
         font-size: 12.5px;
         cursor: pointer;
         transition: all 0.18s;
-        white-space: nowrap;
+        white-space: nowrap !important;
+        flex-shrink: 0;
         font-weight: 500;
         box-shadow: 0 1px 3px rgba(0,0,0,0.06);
       }
