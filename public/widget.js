@@ -320,10 +320,10 @@
 
       /* ── Quick reply chips ─────────────────────────────────────────────── */
       #echo-quick-replies {
-        padding: 8px 16px 4px;
+        padding: 10px 16px 6px;
         display: flex;
         flex-wrap: nowrap;
-        gap: 6px;
+        gap: 7px;
         background: ${msgAreaBg};
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
@@ -331,25 +331,29 @@
       }
       #echo-quick-replies::-webkit-scrollbar { display: none; }
       .echo-qr-btn {
-        background: ${qrBg};
-        border: 1px solid ${qrBorder};
-        color: ${qrText};
-        padding: 6px 14px;
+        background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
+        border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
+        color: ${isDark ? '#c8dff5' : primary};
+        padding: 7px 15px;
         border-radius: 20px;
         font-size: 12.5px;
         cursor: pointer;
-        transition: all 0.18s;
+        transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
         white-space: nowrap !important;
         flex-shrink: 0;
-        font-weight: 500;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        box-shadow: 0 2px 8px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.06);
       }
       .echo-qr-btn:hover {
+        background: ${isDark ? `linear-gradient(135deg, ${primary}44 0%, ${primary}28 100%)` : `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)`};
         border-color: ${primary};
-        color: ${primary};
-        background: ${primary}12;
-        transform: translateY(-1px);
-        box-shadow: 0 3px 10px ${primary}22;
+        color: ${isDark ? '#ffffff' : primary};
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 6px 20px ${primary}44, 0 2px 8px ${primary}22;
+      }
+      .echo-qr-btn:active {
+        transform: translateY(0) scale(0.98);
       }
 
       /* ── Inline forms ──────────────────────────────────────────────────── */
