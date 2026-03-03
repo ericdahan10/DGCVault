@@ -813,7 +813,7 @@
   // ─── Bootstrap ─────────────────────────────────────────────────────────────
   async function init() {
     try {
-      const res = await fetch(WIDGET_CONFIG_URL);
+      const res = await fetch(WIDGET_CONFIG_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('Config fetch failed');
       const cfg = await res.json();
       console.log('[ECHO] widget config received:', cfg);
