@@ -548,6 +548,9 @@
     const workerUrl = cfg.worker_url || WORKER_URL;
     const apiKey = cfg.api_key || '';
     const greeting = cfg.greeting || "Hi! I'm here to help. What can I answer for you?";
+    // Use the UUID returned by /widget-config for all API calls — the data-client-id
+    // attribute may be a slug which doesn't match Supabase UUID lookups.
+    const apiClientId = cfg.client_id || clientId;
     const visitorId = getOrCreateVisitorId();
 
     const widget = document.getElementById('echo-widget');
@@ -666,7 +669,7 @@
           await fetch(`${workerUrl}/lead-capture`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify({ name, email, phone, client_id: clientId, visitor_id: visitorId, source: 'chat_widget' }),
+            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId, source: 'chat_widget' }),
           });
         } catch (e) { /* best effort */ }
       };
@@ -711,7 +714,7 @@
           await fetch(`${workerUrl}/escalation`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify({ name, email, phone, client_id: clientId, visitor_id: visitorId }),
+            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId }),
           });
         } catch (e) { /* best effort */ }
       };
@@ -741,7 +744,7 @@
           body: JSON.stringify({
             messages: chatHistory.slice(-10),
             visitor_id: visitorId,
-            client_id: clientId,
+            client_id: apiClientId,
           }),
         });
 
