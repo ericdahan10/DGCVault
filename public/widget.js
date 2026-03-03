@@ -48,23 +48,28 @@
     const isDark = (cfg.theme || 'light') === 'dark';
 
     // ── Theme tokens — all surface/text colors swap here based on mode ──
-    const surfaceBg    = isDark ? '#111827' : '#ffffff';  // widget bg, input row, footer
-    const msgAreaBg    = isDark ? '#0d1117' : '#f8f9fb';  // scrollable messages area
-    const botBubbleBg  = isDark ? '#1a2d42' : '#ffffff';  // bot message bubbles
-    const botText      = isDark ? '#dde6f0' : '#1a1a2e';  // bot message text
-    const borderColor  = isDark ? 'rgba(255,255,255,0.07)' : '#e5e7eb';  // dividers
-    const inputBorder  = isDark ? 'rgba(255,255,255,0.13)' : '#d0d5dd'; // input borders
-    const inputBg      = isDark ? '#1a2535' : '#ffffff';  // input field bg
-    const inputText    = isDark ? '#e2e8f0' : '#111111';  // input field text
-    const qrBg         = isDark ? '#1a2535' : '#ffffff';  // quick reply chip bg
-    const qrBorder     = isDark ? 'rgba(255,255,255,0.1)' : '#d0d5dd'; // quick reply border
-    const qrText       = isDark ? '#9cb8d8' : '#374151';  // quick reply text
-    const scrollThumb  = isDark ? '#2d4a6a' : '#d0d5dd';  // scrollbar thumb
-    const footerText   = isDark ? '#3a5a7a' : '#9ca3af';  // footer text
-    const widgetBorder = isDark ? 'rgba(45,90,143,0.35)' : 'rgba(0,0,0,0.07)'; // outer border
-    const typingDot    = isDark ? '#4a7aaa' : '#aaa';     // typing indicator dots
-    const mutedText    = isDark ? '#6a8aaa' : '#6b7280';  // label/secondary text
-    const formShadow   = isDark ? '0 24px 60px rgba(0,0,0,0.55)' : '0 8px 40px rgba(0,0,0,0.18)';
+    const surfaceBg    = isDark ? '#0f1923' : '#ffffff';
+    const msgAreaBg    = isDark ? '#0b1320' : '#f4f6fa';
+    const botBubbleBg  = isDark ? 'rgba(26,45,68,0.95)' : '#ffffff';
+    const botText      = isDark ? '#dde6f0' : '#1a1a2e';
+    const borderColor  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
+    const inputBorder  = isDark ? 'rgba(255,255,255,0.12)' : '#d8dde6';
+    const inputBg      = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
+    const inputText    = isDark ? '#e2e8f0' : '#111111';
+    const qrBg         = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
+    const qrBorder     = isDark ? 'rgba(255,255,255,0.1)' : '#d8dde6';
+    const qrText       = isDark ? '#9cb8d8' : '#374151';
+    const scrollThumb  = isDark ? '#2d4a6a' : '#cbd5e1';
+    const footerText   = isDark ? '#2d4a6a' : '#9ca3af';
+    const widgetBorder = isDark ? `${primary}55` : 'rgba(0,0,0,0.06)';
+    const typingDot    = isDark ? '#4a7aaa' : '#94a3b8';
+    const mutedText    = isDark ? '#5a7a9a' : '#6b7280';
+    const formShadow   = isDark
+      ? `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${primary}33`
+      : `0 12px 48px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06)`;
+    const msgAreaPattern = isDark
+      ? 'radial-gradient(circle at 20% 80%, rgba(45,90,143,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.04) 0%, transparent 50%)'
+      : 'radial-gradient(circle at 20% 80%, rgba(45,90,143,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.02) 0%, transparent 50%)';
 
     const style = document.createElement('style');
     style.id = 'echo-widget-styles';
@@ -74,31 +79,30 @@
         position: fixed;
         bottom: 24px;
         right: 24px;
-        width: 62px;
-        height: 62px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
-        background: ${primary};
+        background: linear-gradient(145deg, ${primary}, ${primary}cc);
         border: none;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.28);
+        box-shadow: 0 6px 24px ${primary}66, 0 2px 8px rgba(0,0,0,0.2);
         z-index: 99998;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        position: fixed;
       }
       #echo-launcher:hover {
-        transform: scale(1.08);
-        box-shadow: 0 6px 28px rgba(0,0,0,0.38);
+        transform: scale(1.1);
+        box-shadow: 0 8px 32px ${primary}88, 0 3px 12px rgba(0,0,0,0.25);
       }
       #echo-launcher svg { pointer-events: none; }
 
-      /* Pulsing ring — draws attention to the launcher after 3s, repeats every 6s */
+      /* Pulsing ring — draws attention to the launcher */
       #echo-launcher::before {
         content: '';
         position: absolute;
-        inset: -2px;
+        inset: -3px;
         border-radius: 50%;
         background: ${primary};
         opacity: 0;
@@ -106,8 +110,8 @@
         z-index: -1;
       }
       @keyframes echo-launcher-pulse {
-        0%   { transform: scale(1);   opacity: 0.5; }
-        100% { transform: scale(1.7); opacity: 0;   }
+        0%   { transform: scale(1);   opacity: 0.6; }
+        100% { transform: scale(1.9); opacity: 0;   }
       }
 
       /* ── Orbit ring animations ─────────────────────────────────────────── */
@@ -127,14 +131,14 @@
       /* ── Chat panel ────────────────────────────────────────────────────── */
       #echo-widget {
         position: fixed;
-        bottom: 96px;
+        bottom: 100px;
         right: 24px;
-        width: 380px;
+        width: 390px;
         max-width: calc(100vw - 32px);
-        height: 580px;
+        height: 590px;
         max-height: calc(100vh - 120px);
         background: ${surfaceBg};
-        border-radius: 18px;
+        border-radius: 20px;
         border: 1px solid ${widgetBorder};
         box-shadow: ${formShadow};
         display: flex;
@@ -142,9 +146,9 @@
         overflow: hidden;
         z-index: 99999;
         opacity: 0;
-        transform: translateY(16px) scale(0.97);
+        transform: translateY(20px) scale(0.96);
         pointer-events: none;
-        transition: opacity 0.22s ease, transform 0.22s ease;
+        transition: opacity 0.25s cubic-bezier(0.34,1.56,0.64,1), transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       }
       #echo-widget.echo-open {
@@ -155,135 +159,168 @@
 
       /* ── Header ────────────────────────────────────────────────────────── */
       #echo-header {
-        background: ${primary};
-        /* Subtle radial sheen in top-right corner for depth */
-        background-image: radial-gradient(ellipse at top right, rgba(255,255,255,0.12) 0%, transparent 65%);
-        padding: 14px 16px;
+        background: linear-gradient(135deg, ${primary} 0%, ${primary}bb 100%);
+        background-image:
+          radial-gradient(ellipse at top right, rgba(255,255,255,0.18) 0%, transparent 60%),
+          radial-gradient(ellipse at bottom left, rgba(0,0,0,0.15) 0%, transparent 60%),
+          linear-gradient(135deg, ${primary} 0%, ${primary}bb 100%);
+        padding: 16px 16px 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         flex-shrink: 0;
+        position: relative;
       }
       #echo-header-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 11px;
       }
       .echo-avatar {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.15);
+        border: 1.5px solid rgba(255,255,255,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
       }
       #echo-header h3 {
-        margin: 0;
+        margin: 0 0 1px;
         color: #fff;
         font-size: 15px;
-        font-weight: 600;
+        font-weight: 700;
+        letter-spacing: -0.01em;
       }
       #echo-header p {
         margin: 0;
-        color: rgba(255,255,255,0.75);
-        font-size: 12px;
-      }
-      #echo-close {
-        background: none;
-        border: none;
-        color: rgba(255,255,255,0.75);
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 6px;
+        color: rgba(255,255,255,0.8);
+        font-size: 11.5px;
         display: flex;
         align-items: center;
-        transition: color 0.15s;
+        gap: 5px;
       }
-      #echo-close:hover { color: #fff; }
+      /* Animated online indicator */
+      .echo-status-dot {
+        width: 7px;
+        height: 7px;
+        background: #4ade80;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 0 6px #4ade80aa;
+        animation: echo-status-pulse 2.5s ease-in-out infinite;
+      }
+      @keyframes echo-status-pulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 4px #4ade80aa; }
+        50%       { opacity: 0.7; box-shadow: 0 0 10px #4ade80cc; }
+      }
+      #echo-close {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: rgba(255,255,255,0.85);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        transition: all 0.15s;
+      }
+      #echo-close:hover {
+        background: rgba(255,255,255,0.2);
+        color: #fff;
+      }
 
       /* ── Messages area ─────────────────────────────────────────────────── */
       #echo-messages {
         flex: 1;
         overflow-y: auto;
-        padding: 16px;
+        padding: 18px 16px 10px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         background: ${msgAreaBg};
+        background-image: ${msgAreaPattern};
       }
-      #echo-messages::-webkit-scrollbar { width: 4px; }
+      #echo-messages::-webkit-scrollbar { width: 3px; }
       #echo-messages::-webkit-scrollbar-track { background: transparent; }
       #echo-messages::-webkit-scrollbar-thumb { background: ${scrollThumb}; border-radius: 4px; }
 
       /* Message entry animation */
       @keyframes echo-msg-in {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translateY(10px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
       }
       .echo-msg {
         display: flex;
         align-items: flex-end;
         gap: 8px;
         max-width: 100%;
-        animation: echo-msg-in 0.18s ease;
+        animation: echo-msg-in 0.2s cubic-bezier(0.34,1.56,0.64,1);
       }
       .echo-msg.echo-bot  { align-self: flex-start; }
       .echo-msg.echo-user { align-self: flex-end; flex-direction: row-reverse; }
 
       .echo-bubble {
         padding: 10px 14px;
-        border-radius: 16px;
+        border-radius: 18px;
         font-size: 14px;
-        line-height: 1.5;
-        max-width: 80%;
+        line-height: 1.55;
+        max-width: 78%;
         word-break: break-word;
       }
       .echo-bot .echo-bubble {
         background: ${botBubbleBg};
         color: ${botText};
-        border-bottom-left-radius: 4px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        border-bottom-left-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+        border: 1px solid ${borderColor};
       }
       .echo-user .echo-bubble {
-        background: ${primary};
+        background: linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%);
+        background-image:
+          linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.05) 100%),
+          linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%);
         color: #fff;
-        border-bottom-right-radius: 4px;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 3px 12px ${primary}55, 0 1px 3px rgba(0,0,0,0.1);
       }
 
       .echo-msg-avatar {
         width: 30px;
         height: 30px;
         border-radius: 50%;
-        background: ${primary};
+        background: linear-gradient(135deg, ${primary}, ${primary}aa);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         overflow: hidden;
+        box-shadow: 0 2px 8px ${primary}44;
       }
 
       /* Typing indicator dots */
       .echo-typing span {
         display: inline-block;
-        width: 6px;
-        height: 6px;
+        width: 7px;
+        height: 7px;
         background: ${typingDot};
         border-radius: 50%;
-        margin: 0 1px;
+        margin: 0 2px;
         animation: echo-bounce 1.2s infinite;
       }
       .echo-typing span:nth-child(2) { animation-delay: 0.2s; }
       .echo-typing span:nth-child(3) { animation-delay: 0.4s; }
       @keyframes echo-bounce {
         0%, 80%, 100% { transform: translateY(0); }
-        40% { transform: translateY(-6px); }
+        40% { transform: translateY(-7px); }
       }
 
       /* ── Quick reply chips ─────────────────────────────────────────────── */
       #echo-quick-replies {
-        padding: 8px 16px 0;
+        padding: 8px 16px 4px;
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
@@ -293,39 +330,45 @@
         background: ${qrBg};
         border: 1px solid ${qrBorder};
         color: ${qrText};
-        padding: 6px 12px;
+        padding: 6px 14px;
         border-radius: 20px;
         font-size: 12.5px;
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all 0.18s;
         white-space: nowrap;
+        font-weight: 500;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
       }
       .echo-qr-btn:hover {
         border-color: ${primary};
         color: ${primary};
-        background: rgba(45,90,143,0.08);
+        background: ${primary}12;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px ${primary}22;
       }
 
       /* ── Inline forms ──────────────────────────────────────────────────── */
       #echo-form-area {
-        padding: 10px 16px;
+        padding: 12px 16px;
         background: ${msgAreaBg};
         border-top: 1px solid ${borderColor};
       }
       .echo-inline-form label {
         display: block;
-        font-size: 12px;
-        font-weight: 500;
+        font-size: 11.5px;
+        font-weight: 600;
         color: ${mutedText};
-        margin-bottom: 3px;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
       .echo-inline-form input {
         width: 100%;
-        padding: 8px 10px;
+        padding: 9px 12px;
         border: 1px solid ${inputBorder};
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 13px;
-        margin-bottom: 6px;
+        margin-bottom: 7px;
         box-sizing: border-box;
         outline: none;
         transition: border-color 0.15s, box-shadow 0.15s;
@@ -343,42 +386,49 @@
       }
       .echo-btn-primary {
         flex: 1;
-        padding: 8px;
-        background: ${primary};
+        padding: 9px;
+        background: linear-gradient(135deg, ${primary}, ${primary}cc);
         color: #fff;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 13px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
-        transition: opacity 0.15s;
+        transition: all 0.15s;
+        box-shadow: 0 3px 10px ${primary}44;
       }
-      .echo-btn-primary:hover { opacity: 0.88; }
+      .echo-btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px ${primary}55;
+      }
       .echo-btn-secondary {
-        padding: 8px 14px;
+        padding: 9px 14px;
         background: transparent;
         color: ${mutedText};
         border: 1px solid ${inputBorder};
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 13px;
         cursor: pointer;
+        transition: all 0.15s;
       }
+      .echo-btn-secondary:hover { border-color: ${primary}88; color: ${primary}; }
 
       /* ── Input row ─────────────────────────────────────────────────────── */
       #echo-input-row {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 12px 16px;
+        padding: 12px 14px;
         border-top: 1px solid ${borderColor};
         background: ${surfaceBg};
         flex-shrink: 0;
       }
       #echo-input {
         flex: 1;
-        border: 1px solid ${inputBorder};
-        border-radius: 22px;
-        padding: 9px 14px;
+        border: 1.5px solid ${inputBorder};
+        border-radius: 24px;
+        padding: 10px 16px;
         font-size: 14px;
         outline: none;
         font-family: inherit;
@@ -390,32 +440,39 @@
       #echo-input::placeholder { color: ${mutedText}; }
       #echo-input:focus {
         border-color: ${primary};
-        box-shadow: 0 0 0 3px ${primary}22;
+        box-shadow: 0 0 0 3px ${primary}1a;
       }
       #echo-send {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background: ${primary};
+        background: linear-gradient(135deg, ${primary}, ${primary}cc);
         border: none;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        transition: opacity 0.15s, transform 0.15s;
+        transition: all 0.15s;
+        box-shadow: 0 3px 10px ${primary}44;
       }
-      #echo-send:hover { opacity: 0.85; transform: scale(1.05); }
+      #echo-send:hover {
+        transform: scale(1.08);
+        box-shadow: 0 5px 16px ${primary}66;
+      }
 
       /* ── Footer ────────────────────────────────────────────────────────── */
       #echo-footer {
         text-align: center;
-        padding: 6px;
-        font-size: 10.5px;
+        padding: 7px;
+        font-size: 10px;
         color: ${footerText};
         background: ${surfaceBg};
-        letter-spacing: 0.03em;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        font-weight: 500;
         flex-shrink: 0;
+        border-top: 1px solid ${borderColor};
       }
 
       /* ── Mobile full-screen ────────────────────────────────────────────── */
@@ -454,7 +511,7 @@
             <div class="echo-avatar">${orbitSVG(26)}</div>
             <div>
               <h3>${name}</h3>
-              <p>${brandLine}</p>
+              <p><span class="echo-status-dot"></span>Online · ${brandLine}</p>
             </div>
           </div>
           <button id="echo-close" aria-label="Close chat">
@@ -759,6 +816,7 @@
       const res = await fetch(WIDGET_CONFIG_URL);
       if (!res.ok) throw new Error('Config fetch failed');
       const cfg = await res.json();
+      console.log('[ECHO] widget config received:', cfg);
       injectStyles(cfg);
       injectHTML(cfg);
       initChat(cfg);
