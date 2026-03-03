@@ -1096,6 +1096,13 @@
 
     <!-- Nav links -->
     <div style="display:flex;align-items:center;gap:12px">
+      <!-- Client selector — scopes all pages to the selected client -->
+      <select id="client-selector" onchange="switchClient(this.value)" style="
+        background:#1a1a2e;border:1px solid #2a3a4a;color:#a0b4c8;
+        padding:6px 10px;border-radius:8px;font-size:12px;font-family:'Inter',sans-serif;
+        cursor:pointer;outline:none;min-width:120px;">
+        <option value="">Loading...</option>
+      </select>
       <div class="nav-links">
         <button class="nav-link active" id="nav-knowledge" onclick="navigate('knowledge')">Knowledge Base</button>
         <button class="nav-link" id="nav-leads" onclick="navigate('leads')">Leads</button>
@@ -1558,6 +1565,76 @@
             </div>
           </div>
         </div>
+
+        <!-- Widget Config card -->
+        <div class="card" style="margin-top:20px">
+          <div class="card-title">Widget Appearance</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+            <div class="form-group">
+              <label class="form-label">Bot Name</label>
+              <input class="form-input" id="wc-display-name" type="text" placeholder="ECHO" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tagline</label>
+              <input class="form-input" id="wc-brand-line" type="text" placeholder="AI Assistant" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Color</label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <input type="color" id="wc-color-picker" style="width:36px;height:36px;border:none;background:none;cursor:pointer;padding:0" />
+                <input class="form-input" id="wc-primary-color" type="text" placeholder="#2d5a8f" style="flex:1" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Opening Greeting</label>
+            <textarea class="form-textarea" id="wc-greeting" rows="2" placeholder="Hi! I'm ECHO. How can I help you today?"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Quick Reply Starters (one per line)</label>
+            <textarea class="form-textarea" id="wc-starters" rows="4" placeholder="📅 Book a consultation&#10;⚡ Automate a process&#10;🤖 What services do you offer?&#10;💰 How much does it cost?"></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn btn-primary" onclick="saveWidgetSettings()">Save Widget Config</button>
+          </div>
+        </div>
+
+        <!-- Notification & CRM card -->
+        <div class="card" style="margin-top:20px">
+          <div class="card-title">Lead Notifications</div>
+          <p style="font-size:13px;color:#6a8aaa;margin-bottom:14px;font-family:'Inter',sans-serif">When a lead is captured, the system POSTs their data as JSON to this URL. Use a Formspree endpoint, Zapier webhook, Make.com hook, or any HTTP endpoint.</p>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Notification Webhook URL</label>
+            <input class="form-input" id="wc-webhook" type="url" placeholder="https://formspree.io/f/... or https://hooks.zapier.com/..." />
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">CRM Integration</label>
+            <select class="form-input" id="wc-crm-type" onchange="toggleCrmFields()" style="cursor:pointer">
+              <option value="none">None</option>
+              <option value="hubspot">HubSpot</option>
+            </select>
+          </div>
+          <div id="wc-hubspot-fields" style="display:none">
+            <div class="form-group" style="margin-bottom:14px">
+              <label class="form-label">HubSpot Private App Token</label>
+              <input class="form-input" id="wc-hubspot-token" type="password" placeholder="pat-na1-..." />
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn btn-primary" onclick="saveNotificationSettings()">Save Notification Config</button>
+          </div>
+        </div>
+
+        <!-- Embed Snippet card -->
+        <div class="card" style="margin-top:20px">
+          <div class="card-title">Embed Snippet</div>
+          <p style="font-size:13px;color:#6a8aaa;margin-bottom:14px;font-family:'Inter',sans-serif">Paste this single line into any website's HTML, just before <code style="color:#4a8ac7">&lt;/body&gt;</code>. The widget loads its config automatically from VAULT.</p>
+          <div style="background:#0a0a14;border:1px solid #1e2a3a;border-radius:8px;padding:14px;position:relative">
+            <code id="embed-snippet" style="font-size:12px;color:#7db8e8;font-family:'Courier New',monospace;word-break:break-all;line-height:1.6"></code>
+            <button onclick="copyEmbedSnippet()" style="position:absolute;top:10px;right:10px;background:#1e2a3a;border:1px solid #2a3a4a;color:#a0b4c8;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer">Copy</button>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -1654,6 +1731,7 @@
   function showApp() {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.add('visible');
+    loadClients();
     loadAnalytics();
   }
 
@@ -1673,7 +1751,7 @@
     if (page === 'analytics') loadAnalytics();
     if (page === 'leads')     loadLeads();
     if (page === 'tickets')   loadTickets();
-    if (page === 'settings')  loadSettings();
+    if (page === 'settings')  { loadSettings(); loadWidgetSettings(); }
   }
 
   function switchKbView(view) {
@@ -2646,6 +2724,128 @@
   // Saves back to /settings-save, or resets to the hardcoded default via { reset: true }.
 
   let settingsDefaultPrompt = ''; // cached default for the Reset button
+
+  // ── Multi-client support ────────────────────────────────────────────────────
+  let currentClientId = null; // UUID of the currently selected client
+
+  // Load all clients from Worker, populate the nav selector
+  async function loadClients() {
+    try {
+      const res = await fetch(`${API_URL}/clients-list`, {
+        method: 'GET',
+        headers: { 'X-API-Key': apiKey },
+      });
+      const data = res.ok ? await res.json() : { clients: [] };
+      const sel = document.getElementById('client-selector');
+      sel.innerHTML = '';
+      (data.clients || []).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name || c.slug || c.id;
+        sel.appendChild(opt);
+      });
+      if (data.clients?.length) {
+        currentClientId = data.clients[0].id;
+        sel.value = currentClientId;
+      }
+    } catch (e) {
+      console.warn('Could not load clients:', e.message);
+    }
+  }
+
+  // Called when the client selector changes — reload all data for the new client
+  function switchClient(clientId) {
+    currentClientId = clientId;
+    // Reload whichever page is currently active
+    const activePage = document.querySelector('.page.active')?.id?.replace('page-', '');
+    if (activePage === 'settings') { loadSettings(); loadWidgetSettings(); }
+    if (activePage === 'leads')    reloadLeads?.();
+    if (activePage === 'tickets')  reloadTickets?.();
+    if (activePage === 'analytics') loadAnalytics?.();
+  }
+
+  // ── Widget Settings ─────────────────────────────────────────────────────────
+
+  async function loadWidgetSettings() {
+    try {
+      const data = await callApi('/client-settings-get', { client_id: currentClientId });
+      const wc = data.widget_config || {};
+      document.getElementById('wc-display-name').value  = wc.display_name  || '';
+      document.getElementById('wc-brand-line').value    = wc.brand_line    || '';
+      document.getElementById('wc-greeting').value      = wc.greeting      || '';
+      document.getElementById('wc-primary-color').value = wc.primary_color || '#2d5a8f';
+      document.getElementById('wc-color-picker').value  = wc.primary_color || '#2d5a8f';
+      document.getElementById('wc-starters').value      = (wc.starters || []).join('\n');
+      document.getElementById('wc-webhook').value       = data.notification_webhook || '';
+      const crmType = data.crm_config?.type || 'none';
+      document.getElementById('wc-crm-type').value = crmType;
+      if (crmType === 'hubspot') {
+        document.getElementById('wc-hubspot-fields').style.display = 'block';
+        document.getElementById('wc-hubspot-token').value = data.crm_config?.access_token || '';
+      }
+      updateEmbedSnippet(data.client_id);
+    } catch (e) {
+      console.warn('Could not load widget settings:', e.message);
+    }
+  }
+
+  // Keep color picker and hex input in sync
+  document.getElementById('wc-color-picker').addEventListener('input', function() {
+    document.getElementById('wc-primary-color').value = this.value;
+  });
+  document.getElementById('wc-primary-color').addEventListener('input', function() {
+    if (/^#[0-9a-fA-F]{6}$/.test(this.value)) document.getElementById('wc-color-picker').value = this.value;
+  });
+
+  function toggleCrmFields() {
+    const type = document.getElementById('wc-crm-type').value;
+    document.getElementById('wc-hubspot-fields').style.display = type === 'hubspot' ? 'block' : 'none';
+  }
+
+  async function saveWidgetSettings() {
+    const starters = document.getElementById('wc-starters').value
+      .split('\n').map(s => s.trim()).filter(Boolean);
+    const widget_config = {
+      display_name:  document.getElementById('wc-display-name').value.trim(),
+      brand_line:    document.getElementById('wc-brand-line').value.trim(),
+      greeting:      document.getElementById('wc-greeting').value.trim(),
+      primary_color: document.getElementById('wc-primary-color').value.trim(),
+      starters:      starters.length ? starters : null,
+    };
+    try {
+      await callApi('/client-settings-save', { client_id: currentClientId, widget_config });
+      showToast('Widget config saved — live immediately');
+    } catch (e) { showToast('Save failed: ' + e.message, 'error'); }
+  }
+
+  async function saveNotificationSettings() {
+    const notification_webhook = document.getElementById('wc-webhook').value.trim();
+    const crmType = document.getElementById('wc-crm-type').value;
+    const crm_config = { type: crmType };
+    if (crmType === 'hubspot') {
+      crm_config.access_token = document.getElementById('wc-hubspot-token').value.trim();
+    }
+    try {
+      await callApi('/client-settings-save', { client_id: currentClientId, notification_webhook, crm_config });
+      showToast('Notification config saved');
+    } catch (e) { showToast('Save failed: ' + e.message, 'error'); }
+  }
+
+  function updateEmbedSnippet(clientSlugOrId) {
+    const snippet = `<script src="https://vault.dahangroup.io/widget.js" data-client-id="${clientSlugOrId || 'dgc'}"><\/script>`;
+    document.getElementById('embed-snippet').textContent = snippet;
+  }
+
+  function copyEmbedSnippet() {
+    const text = document.getElementById('embed-snippet').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('Snippet copied!')).catch(() => {
+      const el = document.getElementById('embed-snippet');
+      const range = document.createRange();
+      range.selectNode(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+  }
 
   async function loadSettings() {
     const textarea = document.getElementById('settings-prompt');
