@@ -2834,18 +2834,23 @@
   async function saveWidgetSettings() {
     const starters = document.getElementById('wc-starters').value
       .split('\n').map(s => s.trim()).filter(Boolean);
+    const theme = document.getElementById('wc-theme-light').closest('div').dataset.selectedTheme || 'light';
     const widget_config = {
       display_name:  document.getElementById('wc-display-name').value.trim(),
       brand_line:    document.getElementById('wc-brand-line').value.trim(),
       greeting:      document.getElementById('wc-greeting').value.trim(),
       primary_color: document.getElementById('wc-primary-color').value.trim(),
-      theme:         document.getElementById('wc-theme-light').closest('div').dataset.selectedTheme || 'light',
+      theme,
       starters:      starters.length ? starters : null,
     };
+    console.log('[Vault] saving widget config for client', currentClientId, widget_config);
     try {
       await callApi('/client-settings-save', { client_id: currentClientId, widget_config });
-      showToast('Widget config saved — live immediately');
-    } catch (e) { showToast('Save failed: ' + e.message, 'error'); }
+      showToast(`Widget config saved (theme: ${theme}) — live immediately`);
+    } catch (e) {
+      console.error('[Vault] save failed:', e);
+      showToast('Save failed: ' + e.message, 'error');
+    }
   }
 
   async function saveNotificationSettings() {
