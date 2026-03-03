@@ -32,6 +32,16 @@
     return id;
   }
 
+  // Orbit SVG — DGC ECHO brand logo, shared across launcher, header, and message avatars
+  const orbitSVG = (size) => `
+    <svg width="${size}" height="${size}" viewBox="0 0 50 50" fill="none">
+      <circle cx="25" cy="25" r="19" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
+      <circle cx="25" cy="25" r="5" fill="#ffffff"/>
+      <ellipse cx="25" cy="25" rx="13" ry="8" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.8"
+        transform="rotate(-25 25 25)" class="echo-orbit-ring"/>
+      <circle cx="38" cy="25" r="2.8" fill="#7db8e8" class="echo-orbit-dot"/>
+    </svg>`;
+
   // ─── Inject CSS ────────────────────────────────────────────────────────────
   function injectStyles(cfg) {
     const primary = cfg.primary_color || '#2d5a8f';
@@ -361,16 +371,6 @@
     const brandLine = cfg.brand_line || 'AI Assistant';
 
     const wrapper = document.createElement('div');
-    // Orbit SVG — DGC ECHO brand logo, reused in launcher + message avatars
-    const orbitSVG = (size) => `
-      <svg width="${size}" height="${size}" viewBox="0 0 50 50" fill="none">
-        <circle cx="25" cy="25" r="19" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5"/>
-        <circle cx="25" cy="25" r="5" fill="#ffffff"/>
-        <ellipse cx="25" cy="25" rx="13" ry="8" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.8"
-          transform="rotate(-25 25 25)" class="echo-orbit-ring"/>
-        <circle cx="38" cy="25" r="2.8" fill="#7db8e8" class="echo-orbit-dot"/>
-      </svg>`;
-
     wrapper.innerHTML = `
       <!-- Launcher button -->
       <button id="echo-launcher" aria-label="Open chat">
