@@ -1588,11 +1588,11 @@
             <div class="form-group">
               <label class="form-label">Theme</label>
               <div style="display:flex;gap:6px;margin-top:4px">
-                <button type="button" id="wc-theme-light" onclick="setTheme('light')"
+                <button type="button" id="wc-theme-light" onclick="setTheme('light'); saveWidgetSettings()"
                   style="flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:all 0.15s;background:rgba(255,255,255,0.12);color:#e8edf4">
                   ☀ Light
                 </button>
-                <button type="button" id="wc-theme-dark" onclick="setTheme('dark')"
+                <button type="button" id="wc-theme-dark" onclick="setTheme('dark'); saveWidgetSettings()"
                   style="flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:all 0.15s;background:transparent;color:#6a8aaa">
                   🌙 Dark
                 </button>
