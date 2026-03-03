@@ -1585,6 +1585,19 @@
                 <input class="form-input" id="wc-primary-color" type="text" placeholder="#2d5a8f" style="flex:1" />
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-label">Theme</label>
+              <div style="display:flex;gap:6px;margin-top:4px">
+                <button type="button" id="wc-theme-light" onclick="setTheme('light')"
+                  style="flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:all 0.15s;background:rgba(255,255,255,0.12);color:#e8edf4">
+                  ☀ Light
+                </button>
+                <button type="button" id="wc-theme-dark" onclick="setTheme('dark')"
+                  style="flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:all 0.15s;background:transparent;color:#6a8aaa">
+                  🌙 Dark
+                </button>
+              </div>
+            </div>
           </div>
           <div class="form-group" style="margin-bottom:14px">
             <label class="form-label">Opening Greeting</label>
@@ -2776,6 +2789,7 @@
       document.getElementById('wc-primary-color').value = wc.primary_color || '#2d5a8f';
       document.getElementById('wc-color-picker').value  = wc.primary_color || '#2d5a8f';
       document.getElementById('wc-starters').value      = (wc.starters || []).join('\n');
+      setTheme(wc.theme || 'light');
       document.getElementById('wc-webhook').value       = data.notification_webhook || '';
       const crmType = data.crm_config?.type || 'none';
       document.getElementById('wc-crm-type').value = crmType;
@@ -2797,6 +2811,21 @@
     if (/^#[0-9a-fA-F]{6}$/.test(this.value)) document.getElementById('wc-color-picker').value = this.value;
   });
 
+  // Theme toggle — highlights the active button with a filled style
+  function setTheme(theme) {
+    const lightBtn = document.getElementById('wc-theme-light');
+    const darkBtn  = document.getElementById('wc-theme-dark');
+    if (!lightBtn || !darkBtn) return;
+    const activeStyle   = 'flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.25);transition:all 0.15s;background:rgba(255,255,255,0.18);color:#e8edf4';
+    const inactiveStyle = 'flex:1;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:all 0.15s;background:transparent;color:#6a8aaa';
+    lightBtn.style.cssText = theme === 'light' ? activeStyle : inactiveStyle;
+    darkBtn.style.cssText  = theme === 'dark'  ? activeStyle : inactiveStyle;
+    lightBtn.dataset.theme = 'light';
+    darkBtn.dataset.theme  = 'dark';
+    // Store selection on a hidden attribute for saveWidgetSettings to read
+    document.getElementById('wc-theme-light').closest('div').dataset.selectedTheme = theme;
+  }
+
   function toggleCrmFields() {
     const type = document.getElementById('wc-crm-type').value;
     document.getElementById('wc-hubspot-fields').style.display = type === 'hubspot' ? 'block' : 'none';
@@ -2810,6 +2839,7 @@
       brand_line:    document.getElementById('wc-brand-line').value.trim(),
       greeting:      document.getElementById('wc-greeting').value.trim(),
       primary_color: document.getElementById('wc-primary-color').value.trim(),
+      theme:         document.getElementById('wc-theme-light').closest('div').dataset.selectedTheme || 'light',
       starters:      starters.length ? starters : null,
     };
     try {

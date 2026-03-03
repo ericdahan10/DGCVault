@@ -5,7 +5,7 @@
  * Usage on any website:
  *   <script src="https://vault.dahangroup.io/widget.js" data-client-id="your-client-id"></script>
  *
- * The widget fetches its config (colors, greeting, API endpoint) from the Worker
+ * The widget fetches its config (colors, theme, greeting, API endpoint) from the Worker
  * based on the client-id, then injects its UI and handles all chat logic.
  */
 
@@ -45,9 +45,31 @@
   // ─── Inject CSS ────────────────────────────────────────────────────────────
   function injectStyles(cfg) {
     const primary = cfg.primary_color || '#2d5a8f';
+    const isDark = (cfg.theme || 'light') === 'dark';
+
+    // ── Theme tokens — all surface/text colors swap here based on mode ──
+    const surfaceBg    = isDark ? '#111827' : '#ffffff';  // widget bg, input row, footer
+    const msgAreaBg    = isDark ? '#0d1117' : '#f8f9fb';  // scrollable messages area
+    const botBubbleBg  = isDark ? '#1a2d42' : '#ffffff';  // bot message bubbles
+    const botText      = isDark ? '#dde6f0' : '#1a1a2e';  // bot message text
+    const borderColor  = isDark ? 'rgba(255,255,255,0.07)' : '#e5e7eb';  // dividers
+    const inputBorder  = isDark ? 'rgba(255,255,255,0.13)' : '#d0d5dd'; // input borders
+    const inputBg      = isDark ? '#1a2535' : '#ffffff';  // input field bg
+    const inputText    = isDark ? '#e2e8f0' : '#111111';  // input field text
+    const qrBg         = isDark ? '#1a2535' : '#ffffff';  // quick reply chip bg
+    const qrBorder     = isDark ? 'rgba(255,255,255,0.1)' : '#d0d5dd'; // quick reply border
+    const qrText       = isDark ? '#9cb8d8' : '#374151';  // quick reply text
+    const scrollThumb  = isDark ? '#2d4a6a' : '#d0d5dd';  // scrollbar thumb
+    const footerText   = isDark ? '#3a5a7a' : '#9ca3af';  // footer text
+    const widgetBorder = isDark ? 'rgba(45,90,143,0.35)' : 'rgba(0,0,0,0.07)'; // outer border
+    const typingDot    = isDark ? '#4a7aaa' : '#aaa';     // typing indicator dots
+    const mutedText    = isDark ? '#6a8aaa' : '#6b7280';  // label/secondary text
+    const formShadow   = isDark ? '0 24px 60px rgba(0,0,0,0.55)' : '0 8px 40px rgba(0,0,0,0.18)';
+
     const style = document.createElement('style');
     style.id = 'echo-widget-styles';
     style.textContent = `
+      /* ── Launcher ─────────────────────────────────────────────────────── */
       #echo-launcher {
         position: fixed;
         bottom: 24px;
@@ -64,12 +86,31 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.28);
         z-index: 99998;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: fixed;
       }
       #echo-launcher:hover {
         transform: scale(1.08);
-        box-shadow: 0 6px 28px rgba(0,0,0,0.36);
+        box-shadow: 0 6px 28px rgba(0,0,0,0.38);
       }
       #echo-launcher svg { pointer-events: none; }
+
+      /* Pulsing ring — draws attention to the launcher after 3s, repeats every 6s */
+      #echo-launcher::before {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 50%;
+        background: ${primary};
+        opacity: 0;
+        animation: echo-launcher-pulse 6s ease-out 3s infinite;
+        z-index: -1;
+      }
+      @keyframes echo-launcher-pulse {
+        0%   { transform: scale(1);   opacity: 0.5; }
+        100% { transform: scale(1.7); opacity: 0;   }
+      }
+
+      /* ── Orbit ring animations ─────────────────────────────────────────── */
       .echo-orbit-ring {
         animation: echo-orbit-spin 6s linear infinite;
         transform-origin: 25px 25px;
@@ -83,6 +124,7 @@
         to   { transform: rotate(360deg); }
       }
 
+      /* ── Chat panel ────────────────────────────────────────────────────── */
       #echo-widget {
         position: fixed;
         bottom: 96px;
@@ -91,9 +133,10 @@
         max-width: calc(100vw - 32px);
         height: 580px;
         max-height: calc(100vh - 120px);
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+        background: ${surfaceBg};
+        border-radius: 18px;
+        border: 1px solid ${widgetBorder};
+        box-shadow: ${formShadow};
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -110,8 +153,11 @@
         pointer-events: all;
       }
 
+      /* ── Header ────────────────────────────────────────────────────────── */
       #echo-header {
         background: ${primary};
+        /* Subtle radial sheen in top-right corner for depth */
+        background-image: radial-gradient(ellipse at top right, rgba(255,255,255,0.12) 0%, transparent 65%);
         padding: 14px 16px;
         display: flex;
         align-items: center;
@@ -147,7 +193,7 @@
       #echo-close {
         background: none;
         border: none;
-        color: rgba(255,255,255,0.8);
+        color: rgba(255,255,255,0.75);
         cursor: pointer;
         padding: 4px;
         border-radius: 6px;
@@ -157,6 +203,7 @@
       }
       #echo-close:hover { color: #fff; }
 
+      /* ── Messages area ─────────────────────────────────────────────────── */
       #echo-messages {
         flex: 1;
         overflow-y: auto;
@@ -164,19 +211,25 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background: #f8f9fb;
+        background: ${msgAreaBg};
       }
       #echo-messages::-webkit-scrollbar { width: 4px; }
       #echo-messages::-webkit-scrollbar-track { background: transparent; }
-      #echo-messages::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 4px; }
+      #echo-messages::-webkit-scrollbar-thumb { background: ${scrollThumb}; border-radius: 4px; }
 
+      /* Message entry animation */
+      @keyframes echo-msg-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
       .echo-msg {
         display: flex;
         align-items: flex-end;
         gap: 8px;
         max-width: 100%;
+        animation: echo-msg-in 0.18s ease;
       }
-      .echo-msg.echo-bot { align-self: flex-start; }
+      .echo-msg.echo-bot  { align-self: flex-start; }
       .echo-msg.echo-user { align-self: flex-end; flex-direction: row-reverse; }
 
       .echo-bubble {
@@ -188,10 +241,10 @@
         word-break: break-word;
       }
       .echo-bot .echo-bubble {
-        background: #fff;
-        color: #1a1a2e;
+        background: ${botBubbleBg};
+        color: ${botText};
         border-bottom-left-radius: 4px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       }
       .echo-user .echo-bubble {
         background: ${primary};
@@ -211,11 +264,12 @@
         overflow: hidden;
       }
 
+      /* Typing indicator dots */
       .echo-typing span {
         display: inline-block;
         width: 6px;
         height: 6px;
-        background: #aaa;
+        background: ${typingDot};
         border-radius: 50%;
         margin: 0 1px;
         animation: echo-bounce 1.2s infinite;
@@ -227,17 +281,18 @@
         40% { transform: translateY(-6px); }
       }
 
+      /* ── Quick reply chips ─────────────────────────────────────────────── */
       #echo-quick-replies {
         padding: 8px 16px 0;
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        background: #f8f9fb;
+        background: ${msgAreaBg};
       }
       .echo-qr-btn {
-        background: #fff;
-        border: 1px solid #d0d5dd;
-        color: #374151;
+        background: ${qrBg};
+        border: 1px solid ${qrBorder};
+        color: ${qrText};
         padding: 6px 12px;
         border-radius: 20px;
         font-size: 12.5px;
@@ -248,33 +303,39 @@
       .echo-qr-btn:hover {
         border-color: ${primary};
         color: ${primary};
-        background: rgba(45,90,143,0.05);
+        background: rgba(45,90,143,0.08);
       }
 
+      /* ── Inline forms ──────────────────────────────────────────────────── */
       #echo-form-area {
         padding: 10px 16px;
-        background: #f8f9fb;
-        border-top: 1px solid #e5e7eb;
+        background: ${msgAreaBg};
+        border-top: 1px solid ${borderColor};
       }
       .echo-inline-form label {
         display: block;
         font-size: 12px;
         font-weight: 500;
-        color: #6b7280;
+        color: ${mutedText};
         margin-bottom: 3px;
       }
       .echo-inline-form input {
         width: 100%;
         padding: 8px 10px;
-        border: 1px solid #d0d5dd;
+        border: 1px solid ${inputBorder};
         border-radius: 8px;
         font-size: 13px;
         margin-bottom: 6px;
         box-sizing: border-box;
         outline: none;
-        transition: border-color 0.15s;
+        transition: border-color 0.15s, box-shadow 0.15s;
+        background: ${inputBg};
+        color: ${inputText};
       }
-      .echo-inline-form input:focus { border-color: ${primary}; }
+      .echo-inline-form input:focus {
+        border-color: ${primary};
+        box-shadow: 0 0 0 3px ${primary}22;
+      }
       .echo-inline-form .echo-form-actions {
         display: flex;
         gap: 8px;
@@ -296,34 +357,41 @@
       .echo-btn-secondary {
         padding: 8px 14px;
         background: transparent;
-        color: #6b7280;
-        border: 1px solid #d0d5dd;
+        color: ${mutedText};
+        border: 1px solid ${inputBorder};
         border-radius: 8px;
         font-size: 13px;
         cursor: pointer;
       }
 
+      /* ── Input row ─────────────────────────────────────────────────────── */
       #echo-input-row {
         display: flex;
         align-items: center;
         gap: 8px;
         padding: 12px 16px;
-        border-top: 1px solid #e5e7eb;
-        background: #fff;
+        border-top: 1px solid ${borderColor};
+        background: ${surfaceBg};
         flex-shrink: 0;
       }
       #echo-input {
         flex: 1;
-        border: 1px solid #d0d5dd;
+        border: 1px solid ${inputBorder};
         border-radius: 22px;
         padding: 9px 14px;
         font-size: 14px;
         outline: none;
         font-family: inherit;
-        transition: border-color 0.15s;
+        transition: border-color 0.15s, box-shadow 0.15s;
         resize: none;
+        background: ${inputBg};
+        color: ${inputText};
       }
-      #echo-input:focus { border-color: ${primary}; }
+      #echo-input::placeholder { color: ${mutedText}; }
+      #echo-input:focus {
+        border-color: ${primary};
+        box-shadow: 0 0 0 3px ${primary}22;
+      }
       #echo-send {
         width: 36px;
         height: 36px;
@@ -335,20 +403,22 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        transition: opacity 0.15s;
+        transition: opacity 0.15s, transform 0.15s;
       }
-      #echo-send:hover { opacity: 0.85; }
+      #echo-send:hover { opacity: 0.85; transform: scale(1.05); }
 
+      /* ── Footer ────────────────────────────────────────────────────────── */
       #echo-footer {
         text-align: center;
         padding: 6px;
         font-size: 10.5px;
-        color: #9ca3af;
-        background: #fff;
+        color: ${footerText};
+        background: ${surfaceBg};
         letter-spacing: 0.03em;
         flex-shrink: 0;
       }
 
+      /* ── Mobile full-screen ────────────────────────────────────────────── */
       @media (max-width: 480px) {
         #echo-widget {
           bottom: 0;
@@ -535,7 +605,6 @@
         formAreaEl.innerHTML = '';
         addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
 
-        // Send lead to worker
         try {
           await fetch(`${workerUrl}/lead-capture`, {
             method: 'POST',
@@ -630,13 +699,11 @@
         chatHistory.push({ role: 'assistant', content: reply });
         addMsg(reply, 'bot');
 
-        // Handle routing hints from worker
         if (routing.action === 'escalation') {
           showEscalationForm();
         } else if (routing.action === 'contact') {
           showContactForm();
         } else {
-          // Show contextual quick replies
           showQuickReplies(['Tell me more', 'Book a consultation', 'Something else']);
         }
       } catch (err) {
@@ -681,7 +748,6 @@
       }
     });
 
-    // Close on Escape
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && isOpen) close();
     });
@@ -697,13 +763,13 @@
       injectHTML(cfg);
       initChat(cfg);
     } catch (err) {
-      // Fallback to DGC defaults so the widget never silently breaks
       console.warn('[ECHO widget] Could not load config, using defaults.', err);
       const defaults = {
         display_name: 'ECHO',
         brand_line: 'AI Assistant',
         greeting: "Hi! I'm ECHO. How can I help you today?",
         primary_color: '#2d5a8f',
+        theme: 'light',
         api_key: '',
         worker_url: WORKER_URL,
       };
@@ -713,7 +779,6 @@
     }
   }
 
-  // Wait for DOM to be ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
