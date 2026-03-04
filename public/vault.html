@@ -36,6 +36,15 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@400;500&family=Questrial&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("vault_key")) {
+            document.documentElement.classList.add("vault-auth-pending");
+          }
+        } catch (_) {}
+      })();
+    </script>
     <style>
       *,
       *::before,
@@ -163,6 +172,10 @@
       }
 
       #login-screen.hidden {
+        display: none;
+      }
+
+      html.vault-auth-pending #login-screen {
         display: none;
       }
 
@@ -3935,6 +3948,7 @@
 
       // On load — auto-login if key is stored
       window.addEventListener("DOMContentLoaded", async () => {
+        const root = document.documentElement;
         if (apiKey) {
           const ok = await verifyKey(apiKey);
           if (ok) {
@@ -3944,6 +3958,7 @@
           localStorage.removeItem("vault_key");
           apiKey = "";
         }
+        root.classList.remove("vault-auth-pending");
       });
 
       // Enter key on either field submits
@@ -4015,6 +4030,7 @@
       }
 
       function doLogout() {
+        document.documentElement.classList.remove("vault-auth-pending");
         localStorage.removeItem("vault_key");
         apiKey = "";
         document.getElementById("app").classList.remove("visible");
@@ -4028,6 +4044,7 @@
       }
 
       function showApp() {
+        document.documentElement.classList.remove("vault-auth-pending");
         document.getElementById("login-screen").classList.add("hidden");
         document.getElementById("app").classList.add("visible");
         loadClients();
