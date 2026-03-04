@@ -327,26 +327,26 @@
       /* ── Quick reply chips — rendered inline in message flow ───────────── */
       .echo-chip-row {
         display: flex;
-        flex-wrap: nowrap;
-        gap: 7px;
-        overflow-x: auto;
-        padding: 4px 0 2px;
+        flex-direction: column;
+        gap: 8px;
+        overflow: visible;
+        padding: 4px 0 4px;
         align-self: flex-start;
-        max-width: 100%;
-        scrollbar-width: none;
+        width: 100%;
+        max-width: 270px;
       }
-      .echo-chip-row::-webkit-scrollbar { display: none; }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
         color: ${isDark ? "#c8dff5" : primary};
-        padding: 7px 15px;
-        border-radius: 20px;
-        font-size: 12.5px;
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-size: 13px;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        white-space: nowrap !important;
-        flex-shrink: 0;
+        white-space: normal !important;
+        width: 100%;
+        text-align: left;
         font-weight: 600;
         letter-spacing: 0.01em;
         box-shadow: 0 2px 8px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.06);
@@ -722,7 +722,10 @@
         const email = document.getElementById("echo-cf-email").value.trim();
         const phone = document.getElementById("echo-cf-phone").value.trim();
         if (!name || !email) {
-          addMsg("Please enter both your name and email so I can submit this.", "bot");
+          addMsg(
+            "Please enter both your name and email so I can submit this.",
+            "bot",
+          );
           return;
         }
 
