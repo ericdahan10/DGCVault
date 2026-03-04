@@ -321,14 +321,15 @@
       /* ── Quick reply chips — rendered inline in message flow ───────────── */
       .echo-chip-row {
         display: flex;
-        flex-direction: column;
+        flex-wrap: nowrap;
         gap: 7px;
-        overflow: visible;
+        overflow-x: auto;
         padding: 4px 0 2px;
         align-self: flex-start;
-        width: 100%;
-        max-width: 78%;
+        max-width: 100%;
+        scrollbar-width: none;
       }
+      .echo-chip-row::-webkit-scrollbar { display: none; }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
@@ -338,9 +339,8 @@
         font-size: 12.5px;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        white-space: normal !important;
-        width: 100%;
-        text-align: left;
+        white-space: nowrap !important;
+        flex-shrink: 0;
         font-weight: 600;
         letter-spacing: 0.01em;
         box-shadow: 0 2px 8px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.06);
@@ -571,48 +571,6 @@
     let chatHistory = [];
     let isOpen = false;
     let hasOpened = false;
-    let notificationWebhook = null;
-    let webhookLoaded = false;
-
-    async function loadNotificationWebhook() {
-      if (webhookLoaded) return notificationWebhook;
-      webhookLoaded = true;
-      try {
-        const res = await fetch(`${workerUrl}/client-settings-get`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-          body: JSON.stringify({ client_id: apiClientId }),
-        });
-        if (!res.ok) return null;
-        const data = await res.json();
-        notificationWebhook = (data.notification_webhook || '').trim() || null;
-      } catch {
-        notificationWebhook = null;
-      }
-      return notificationWebhook;
-    }
-
-    async function submitFormspreeFallback(leadPayload) {
-      const webhook = await loadNotificationWebhook();
-      if (!webhook || !/formspree\.io\//i.test(webhook)) return false;
-      const params = new URLSearchParams();
-      params.set('name', leadPayload.name || 'Unknown');
-      params.set('email', leadPayload.email || '');
-      params.set('phone', leadPayload.phone || '—');
-      params.set('message', leadPayload.message || '—');
-      params.set('source', leadPayload.source || 'chatbot');
-      params.set('_subject', `New Chatbot Lead · ${leadPayload.name || 'Unknown'}`);
-      if (leadPayload.email) params.set('_replyto', leadPayload.email);
-      const res = await fetch(webhook, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json',
-        },
-        body: params.toString(),
-      });
-      return res.ok;
-    }
 
     // ── Rendering helpers ──
 
@@ -712,54 +670,19 @@
         const name = document.getElementById('echo-cf-name').value.trim();
         const email = document.getElementById('echo-cf-email').value.trim();
         const phone = document.getElementById('echo-cf-phone').value.trim();
-        const submitBtn = document.getElementById('echo-cf-submit');
-        if (!name || !email) {
-          addMsg('Please fill in your name and email.', 'bot');
-          return;
-        }
+        if (!name || !email) return;
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-
-        const latestUserMessage = [...chatHistory].reverse().find(m => m.role === 'user')?.content || '';
-        const leadPayload = {
-          client_id: apiClientId,
-          visitor_id: visitorId,
-          source: 'chat_widget',
-          name,
-          email,
-          phone,
-          visitor_name: name,
-          visitor_email: email,
-          visitor_phone: phone,
-          message: latestUserMessage,
-        };
+        formAreaEl.style.display = 'none';
+        formAreaEl.innerHTML = '';
+        addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
 
         try {
-          const res = await fetch(`${workerUrl}/lead-capture`, {
+          await fetch(`${workerUrl}/lead-capture`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify(leadPayload),
+            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId, source: 'chat_widget' }),
           });
-          if (!res.ok) {
-            let err = `Failed to submit (${res.status})`;
-            try {
-              const body = await res.json();
-              err = body?.error || body?.message || err;
-            } catch {}
-            throw new Error(err);
-          }
-
-          await submitFormspreeFallback(leadPayload).catch(() => false);
-
-          formAreaEl.style.display = 'none';
-          formAreaEl.innerHTML = '';
-          addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
-        } catch (e) {
-          addMsg(`I couldn't submit your details right now. Please try again in a moment. (${e.message})`, 'bot');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Send →';
-        }
+        } catch (e) { /* best effort */ }
       };
     }
 
@@ -794,20 +717,6 @@
           return;
         }
 
-        const latestUserMessage = [...chatHistory].reverse().find(m => m.role === 'user')?.content || '';
-        const leadPayload = {
-          client_id: apiClientId,
-          visitor_id: visitorId,
-          source: 'chat_widget',
-          name,
-          email,
-          phone,
-          visitor_name: name,
-          visitor_email: email,
-          visitor_phone: phone,
-          message: latestUserMessage,
-        };
-
         formAreaEl.style.display = 'none';
         formAreaEl.innerHTML = '';
         addMsg(`Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`, 'bot');
@@ -818,11 +727,9 @@
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
             body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId }),
           });
-          await submitFormspreeFallback(leadPayload).catch(() => false);
         } catch (e) { /* best effort */ }
       };
-
-            }
+    }
 
     // ── Core send ──
 
@@ -923,7 +830,6 @@
       const res = await fetch(WIDGET_CONFIG_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('Config fetch failed');
       const cfg = await res.json();
-      console.log('[ECHO] widget config received:', cfg);
       injectStyles(cfg);
       injectHTML(cfg);
       initChat(cfg);
