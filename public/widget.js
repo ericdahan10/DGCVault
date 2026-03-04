@@ -670,19 +670,52 @@
         const name = document.getElementById('echo-cf-name').value.trim();
         const email = document.getElementById('echo-cf-email').value.trim();
         const phone = document.getElementById('echo-cf-phone').value.trim();
-        if (!name || !email) return;
+        const submitBtn = document.getElementById('echo-cf-submit');
+        if (!name || !email) {
+          addMsg('Please fill in your name and email.', 'bot');
+          return;
+        }
 
-        formAreaEl.style.display = 'none';
-        formAreaEl.innerHTML = '';
-        addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
+        const latestUserMessage = [...chatHistory].reverse().find(m => m.role === 'user')?.content || '';
+        const leadPayload = {
+          client_id: apiClientId,
+          visitor_id: visitorId,
+          source: 'chatbot',
+          name,
+          email,
+          phone,
+          visitor_name: name,
+          visitor_email: email,
+          visitor_phone: phone,
+          message: latestUserMessage,
+        };
 
         try {
-          await fetch(`${workerUrl}/lead-capture`, {
+          const res = await fetch(`${workerUrl}/lead-capture`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId, source: 'chat_widget' }),
+            body: JSON.stringify(leadPayload),
           });
-        } catch (e) { /* best effort */ }
+          if (!res.ok) {
+            let err = `Failed to submit (${res.status})`;
+            try {
+              const body = await res.json();
+              err = body?.error || body?.message || err;
+            } catch {}
+            throw new Error(err);
+          }
+
+          formAreaEl.style.display = 'none';
+          formAreaEl.innerHTML = '';
+          addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
+        } catch (e) {
+          addMsg(`I couldn't submit your details right now. Please try again in a moment. (${e.message})`, 'bot');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send →';
+        }
       };
     }
 
