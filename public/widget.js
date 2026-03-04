@@ -271,6 +271,9 @@
         width: 100%;
         justify-content: flex-end;
       }
+      .echo-msg.echo-user .echo-bubble {
+        margin-left: auto;
+      }
       .echo-msg.echo-user.echo-short .echo-bubble {
         white-space: nowrap;
         width: max-content;
@@ -291,7 +294,8 @@
         color: ${botText};
         border-bottom-left-radius: 5px;
         box-shadow: 0 3px 12px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.06);
-        border: 1px solid ${borderColor};
+        border: 1px solid ${isDark ? "rgba(144,180,220,0.16)" : borderColor};
+        backdrop-filter: blur(2px);
       }
       .echo-user .echo-bubble {
         max-width: 78%;
@@ -301,7 +305,8 @@
           linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%);
         color: #fff;
         border-bottom-right-radius: 5px;
-        box-shadow: 0 3px 12px ${primary}55, 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 22px ${primary}4f, 0 1px 3px rgba(0,0,0,0.12);
+        border: 1px solid ${primary}88;
       }
 
       .echo-msg-avatar {
@@ -345,6 +350,9 @@
         width: auto;
         max-width: 78%;
       }
+      .echo-chip-row.echo-user {
+        margin-left: auto;
+      }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
@@ -364,6 +372,7 @@
         font-weight: 600;
         letter-spacing: 0.01em;
         box-shadow: 0 2px 8px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.06);
+        border-left-width: 2px;
       }
       .echo-qr-btn:hover {
         background: ${isDark ? `linear-gradient(135deg, ${primary}44 0%, ${primary}28 100%)` : `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)`};
@@ -683,7 +692,7 @@
     function showQuickReplies(options) {
       clearQuickReplies();
       const row = document.createElement("div");
-      row.className = "echo-chip-row";
+      row.className = "echo-chip-row echo-user";
       options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "echo-qr-btn";
