@@ -265,10 +265,16 @@
         animation: echo-msg-in 0.2s cubic-bezier(0.34,1.56,0.64,1);
       }
       .echo-msg.echo-bot  { align-self: flex-start; }
-      .echo-msg.echo-user { align-self: flex-end; flex-direction: row-reverse; }
+      .echo-msg.echo-user {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+        width: 100%;
+        justify-content: flex-end;
+      }
       .echo-msg.echo-user.echo-short .echo-bubble {
         white-space: nowrap;
-        max-width: 92%;
+        width: max-content;
+        max-width: calc(100% - 6px);
       }
 
       .echo-bubble {
@@ -349,10 +355,12 @@
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
         white-space: nowrap !important;
-        width: fit-content;
-        min-width: 220px;
+        width: auto;
         max-width: 100%;
         text-align: left;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1.2;
         font-weight: 600;
         letter-spacing: 0.01em;
         box-shadow: 0 2px 8px ${primary}22, inset 0 1px 0 rgba(255,255,255,0.06);
@@ -373,35 +381,25 @@
         display: none !important;
       }
       .echo-inline-form {
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        padding: 0;
-        box-shadow: none;
+        background: ${isDark ? "rgba(14,26,40,0.65)" : "rgba(255,255,255,0.92)"};
+        border: 1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(45,90,143,0.18)"};
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
         animation: echo-form-in 0.2s ease-out;
       }
       @keyframes echo-form-in {
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .echo-visually-hidden {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        border: 0;
-      }
       .echo-inline-form label {
         display: block;
-        font-size: 11px;
+        font-size: 10.5px;
         font-weight: 600;
         color: ${mutedText};
-        margin: 0 0 4px;
+        margin: 0 0 5px;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.06em;
       }
       .echo-inline-form input {
         width: 100%;
@@ -417,8 +415,8 @@
         color: ${inputText};
       }
       .echo-form-msg .echo-bubble {
-        max-width: 82%;
-        padding: 10px;
+        max-width: 84%;
+        padding: 8px;
         background: ${isDark ? "linear-gradient(160deg, rgba(30,48,74,0.96), rgba(20,34,53,0.96))" : "linear-gradient(160deg, #ffffff, #f8fbff)"};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}40`};
         box-shadow: 0 12px 30px ${primary}24, inset 0 1px 0 rgba(255,255,255,0.06);
@@ -444,7 +442,7 @@
       .echo-inline-form .echo-form-actions {
         display: flex;
         gap: 8px;
-        margin-top: 2px;
+        margin-top: 4px;
       }
       .echo-btn-primary {
         flex: 1;
@@ -742,11 +740,11 @@
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
-          <label class="echo-visually-hidden">Name</label>
-          <input id="echo-cf-name" type="text" placeholder="Name" />
-          <label class="echo-visually-hidden">Email</label>
-          <input id="echo-cf-email" type="email" placeholder="Email" />
-          <label class="echo-visually-hidden">Phone (optional)</label>
+          <label>Name</label>
+          <input id="echo-cf-name" type="text" placeholder="Your name" />
+          <label>Email</label>
+          <input id="echo-cf-email" type="email" placeholder="you@email.com" />
+          <label>Phone (optional)</label>
           <input id="echo-cf-phone" type="tel" placeholder="Phone (optional)" />
           <div class="echo-form-actions">
             <button class="echo-btn-primary" id="echo-cf-submit">Send →</button>
@@ -802,11 +800,11 @@
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
-          <label class="echo-visually-hidden">Name</label>
-          <input id="echo-ef-name" type="text" placeholder="Name" />
-          <label class="echo-visually-hidden">Email</label>
-          <input id="echo-ef-email" type="email" placeholder="Email" />
-          <label class="echo-visually-hidden">Phone (optional)</label>
+          <label>Name</label>
+          <input id="echo-ef-name" type="text" placeholder="Your name" />
+          <label>Email</label>
+          <input id="echo-ef-email" type="email" placeholder="you@email.com" />
+          <label>Phone (optional)</label>
           <input id="echo-ef-phone" type="tel" placeholder="Phone (optional)" />
           <div class="echo-form-actions">
             <button class="echo-btn-primary" id="echo-ef-submit">Submit ticket →</button>
