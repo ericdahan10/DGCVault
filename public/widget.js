@@ -266,6 +266,10 @@
       }
       .echo-msg.echo-bot  { align-self: flex-start; }
       .echo-msg.echo-user { align-self: flex-end; flex-direction: row-reverse; }
+      .echo-msg.echo-user.echo-short .echo-bubble {
+        white-space: nowrap;
+        max-width: 92%;
+      }
 
       .echo-bubble {
         padding: 10px 13px;
@@ -415,6 +419,20 @@
       .echo-form-msg .echo-bubble {
         max-width: 82%;
         padding: 10px;
+        background: ${isDark ? "linear-gradient(160deg, rgba(30,48,74,0.96), rgba(20,34,53,0.96))" : "linear-gradient(160deg, #ffffff, #f8fbff)"};
+        border: 1px solid ${isDark ? `${primary}55` : `${primary}40`};
+        box-shadow: 0 12px 30px ${primary}24, inset 0 1px 0 rgba(255,255,255,0.06);
+        position: relative;
+      }
+      .echo-form-msg .echo-bubble::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        border-radius: 14px 14px 0 0;
+        background: linear-gradient(90deg, ${primary}dd, ${primary}55);
       }
       .echo-form-msg .echo-msg-avatar {
         margin-top: 4px;
@@ -440,6 +458,7 @@
         cursor: pointer;
         transition: all 0.15s;
         box-shadow: 0 3px 10px ${primary}44;
+        letter-spacing: 0.01em;
       }
       .echo-btn-primary:hover {
         opacity: 0.9;
@@ -630,6 +649,10 @@
     function addMsg(text, who) {
       const el = document.createElement("div");
       el.className = `echo-msg echo-${who}`;
+      const normalized = String(text || "").replace(/\s+/g, " ").trim();
+      if (who === "user" && normalized.length <= 26 && !normalized.includes("\n")) {
+        el.classList.add("echo-short");
+      }
       if (who === "bot") {
         el.innerHTML = `
           <div class="echo-msg-avatar">${orbitSVG(28)}</div>
@@ -670,10 +693,11 @@
       options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "echo-qr-btn";
-        btn.textContent = opt;
+        const cleanOpt = String(opt || "").replace(/\s+/g, " ").trim();
+        btn.textContent = cleanOpt;
         btn.onclick = () => {
           clearQuickReplies();
-          sendMessage(opt);
+          sendMessage(cleanOpt);
         };
         row.appendChild(btn);
       });
