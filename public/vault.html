@@ -2059,6 +2059,57 @@
       }
 
       /* ── Responsive ─────────────────────────────────────────────────────────── */
+      @media (max-width: 980px) {
+        #app .top-nav {
+          height: auto;
+          min-height: 64px;
+          padding: 10px 12px;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        #app .top-nav > svg {
+          width: 150px;
+          height: auto;
+          flex-shrink: 0;
+        }
+        #app .top-nav > div {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          padding-bottom: 2px;
+          scrollbar-width: none;
+        }
+        #app .top-nav > div::-webkit-scrollbar {
+          display: none;
+        }
+        #app .nav-links {
+          display: flex;
+          flex-wrap: nowrap;
+          gap: 6px;
+        }
+        #app .nav-link,
+        #app .nav-logout {
+          white-space: nowrap;
+          font-size: 11px;
+          padding: 6px 10px;
+        }
+        #client-selector {
+          min-width: 105px !important;
+          font-size: 11px !important;
+          padding: 6px 8px !important;
+        }
+        #app .app-body {
+          padding-top: 118px;
+        }
+
+        .login-card {
+          max-width: 460px;
+          padding: 40px 28px 32px;
+        }
+      }
+
       @media (max-width: 700px) {
         .stats-grid {
           grid-template-columns: repeat(2, 1fr);
@@ -2105,6 +2156,44 @@
           align-items: center;
           width: 100%;
           justify-content: space-between;
+        }
+
+        #app .top-nav {
+          padding: 8px 10px;
+          gap: 8px;
+        }
+        #app .top-nav > svg {
+          width: 128px;
+          height: auto;
+        }
+        #app .top-nav > div {
+          gap: 6px;
+        }
+        #app .nav-link,
+        #app .nav-logout {
+          padding: 6px 9px;
+          font-size: 10px;
+        }
+        #app .app-body {
+          padding-top: 110px;
+        }
+
+        .login-card {
+          padding: 30px 18px 24px;
+          border-radius: 12px;
+        }
+        .vault-title {
+          font-size: 38px;
+        }
+        .vault-tag {
+          font-size: 8px;
+          letter-spacing: 0.18em;
+        }
+        .app-content {
+          padding: 18px 12px;
+        }
+        .page-header {
+          margin-bottom: 18px;
         }
       }
     </style>
