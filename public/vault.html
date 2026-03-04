@@ -160,6 +160,27 @@
         border-color: rgba(239, 68, 68, 0.3);
       }
 
+      .mobile-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid #2a3d5c;
+        background: rgba(255, 255, 255, 0.02);
+        cursor: pointer;
+      }
+
+      .mobile-nav-toggle span {
+        display: block;
+        width: 16px;
+        height: 2px;
+        background: #8ea5be;
+        margin: 2px 0;
+        transition: all 0.2s;
+      }
+
       /* ── LOGIN SCREEN ──────────────────────────────────────────────────────── */
       #login-screen {
         position: fixed;
@@ -2168,43 +2189,52 @@
         #app .top-nav {
           padding: 8px 10px;
           gap: 10px;
+          align-items: center;
         }
         #app .top-nav > svg {
           width: 128px;
           height: auto;
         }
+        #app .mobile-nav-toggle {
+          display: inline-flex;
+          margin-left: auto;
+        }
         #app .top-nav > div {
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
+          display: none;
+          flex-direction: column;
+          align-items: stretch;
+          justify-content: flex-start;
+          flex-wrap: nowrap;
           gap: 8px;
+          width: 100%;
+          margin-top: 4px;
+          padding-top: 8px;
+          border-top: 1px solid #2a3d5c;
+        }
+        #app .top-nav.mobile-open > div {
+          display: flex;
         }
         #client-selector {
           order: 1;
-          width: auto;
+          width: 100%;
           min-width: 0 !important;
-          flex: 1 1 180px;
+          flex: 0 0 auto;
           font-size: 12px !important;
           padding: 8px 10px !important;
         }
         #app .nav-links {
-          order: 3;
+          order: 2;
           width: 100%;
-          flex-wrap: nowrap;
-          overflow-x: auto;
-          padding: 4px;
+          flex-direction: column;
+          overflow: visible;
+          padding: 6px;
           border: 1px solid #2a3d5c;
           border-radius: 10px;
           background: rgba(20, 28, 40, 0.55);
-          scrollbar-width: none;
-        }
-        #app .nav-links::-webkit-scrollbar {
-          display: none;
         }
         #app .top-nav > div > .nav-logout {
-          order: 2;
-          width: auto;
+          order: 3;
+          width: 100%;
           margin-left: 0;
           flex: 0 0 auto;
         }
@@ -2213,6 +2243,8 @@
           min-height: 34px;
           padding: 7px 10px;
           font-size: 11px;
+          width: 100%;
+          text-align: left;
         }
         #app .nav-link {
           border: 1px solid transparent;
@@ -2222,7 +2254,10 @@
           color: #8ea5be;
         }
         #app .app-body {
-          padding-top: 162px;
+          padding-top: 64px;
+        }
+        #app .top-nav.mobile-open + .app-body {
+          padding-top: 258px;
         }
       }
 
@@ -2234,7 +2269,6 @@
           width: 118px;
         }
         #client-selector {
-          flex-basis: 150px;
           font-size: 11px !important;
         }
         #app .nav-link,
@@ -2244,7 +2278,10 @@
           min-height: 32px;
         }
         #app .app-body {
-          padding-top: 154px;
+          padding-top: 64px;
+        }
+        #app .top-nav.mobile-open + .app-body {
+          padding-top: 246px;
         }
 
         .login-card {
@@ -2520,8 +2557,21 @@
           </text>
         </svg>
 
+        <button
+          class="mobile-nav-toggle"
+          id="mobile-nav-toggle"
+          onclick="toggleMobileNav()"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+          type="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
         <!-- Nav links -->
-        <div style="display: flex; align-items: center; gap: 12px">
+        <div class="nav-controls" style="display: flex; align-items: center; gap: 12px">
           <!-- Client selector — scopes all pages to the selected client -->
           <select
             id="client-selector"
@@ -4188,6 +4238,7 @@
       }
 
       function doLogout() {
+        closeMobileNav();
         document.documentElement.classList.remove("vault-auth-pending");
         localStorage.removeItem("vault_key");
         apiKey = "";
@@ -4233,7 +4284,28 @@
           loadSettings();
           loadWidgetSettings();
         }
+        closeMobileNav();
       }
+
+      function toggleMobileNav() {
+        const nav = document.querySelector("#app .top-nav");
+        const btn = document.getElementById("mobile-nav-toggle");
+        if (!nav || !btn) return;
+        const isOpen = nav.classList.toggle("mobile-open");
+        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
+
+      function closeMobileNav() {
+        const nav = document.querySelector("#app .top-nav");
+        const btn = document.getElementById("mobile-nav-toggle");
+        if (!nav) return;
+        nav.classList.remove("mobile-open");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      }
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 700) closeMobileNav();
+      });
 
       function switchKbView(view) {
         document
