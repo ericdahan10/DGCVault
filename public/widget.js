@@ -318,18 +318,18 @@
         40% { transform: translateY(-7px); }
       }
 
-      /* ── Quick reply chips ─────────────────────────────────────────────── */
-      #echo-quick-replies {
-        padding: 10px 16px 6px;
+      /* ── Quick reply chips — rendered inline in message flow ───────────── */
+      .echo-chip-row {
         display: flex;
         flex-wrap: nowrap;
         gap: 7px;
-        background: ${msgAreaBg};
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 4px 0 2px;
+        align-self: flex-start;
+        max-width: 100%;
         scrollbar-width: none;
       }
-      #echo-quick-replies::-webkit-scrollbar { display: none; }
+      .echo-chip-row::-webkit-scrollbar { display: none; }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
@@ -532,8 +532,6 @@
 
         <div id="echo-messages"></div>
 
-        <div id="echo-quick-replies"></div>
-
         <div id="echo-form-area" style="display:none;"></div>
 
         <div id="echo-input-row">
@@ -568,7 +566,6 @@
     const messagesEl = document.getElementById('echo-messages');
     const inputEl = document.getElementById('echo-input');
     const sendBtn = document.getElementById('echo-send');
-    const quickRepliesEl = document.getElementById('echo-quick-replies');
     const formAreaEl = document.getElementById('echo-form-area');
 
     let chatHistory = [];
@@ -617,18 +614,23 @@
     }
 
     function clearQuickReplies() {
-      quickRepliesEl.innerHTML = '';
+      const existing = messagesEl.querySelector('.echo-chip-row');
+      if (existing) existing.remove();
     }
 
     function showQuickReplies(options) {
       clearQuickReplies();
+      const row = document.createElement('div');
+      row.className = 'echo-chip-row';
       options.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'echo-qr-btn';
         btn.textContent = opt;
         btn.onclick = () => { clearQuickReplies(); sendMessage(opt); };
-        quickRepliesEl.appendChild(btn);
+        row.appendChild(btn);
       });
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
     function showStarters() {

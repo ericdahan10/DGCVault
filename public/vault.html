@@ -2740,6 +2740,18 @@
 
   // ── Multi-client support ────────────────────────────────────────────────────
   let currentClientId = null; // UUID of the currently selected client
+  let clientsIndex = [];      // cached list from /clients-list
+
+  function isUuid(v) {
+    return typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+  }
+
+  function resolveClientUuid(clientIdOrSlug) {
+    if (!clientIdOrSlug) return null;
+    if (isUuid(clientIdOrSlug)) return clientIdOrSlug;
+    const match = clientsIndex.find(c => c.slug === clientIdOrSlug || c.id === clientIdOrSlug);
+    return match?.id || null;
+  }
 
   // Load all clients from Worker, populate the nav selector
   async function loadClients() {
@@ -2749,16 +2761,17 @@
         headers: { 'X-API-Key': apiKey },
       });
       const data = res.ok ? await res.json() : { clients: [] };
+      clientsIndex = data.clients || [];
       const sel = document.getElementById('client-selector');
       sel.innerHTML = '';
-      (data.clients || []).forEach(c => {
+      clientsIndex.forEach(c => {
         const opt = document.createElement('option');
-        opt.value = c.id;
+        opt.value = c.id || c.slug || '';
         opt.textContent = c.name || c.slug || c.id;
         sel.appendChild(opt);
       });
-      if (data.clients?.length) {
-        currentClientId = data.clients[0].id;
+      if (clientsIndex.length) {
+        currentClientId = resolveClientUuid(clientsIndex[0].id || clientsIndex[0].slug);
         sel.value = currentClientId;
       }
     } catch (e) {
@@ -2768,7 +2781,7 @@
 
   // Called when the client selector changes — reload all data for the new client
   function switchClient(clientId) {
-    currentClientId = clientId;
+    currentClientId = resolveClientUuid(clientId) || clientId;
     // Reload whichever page is currently active
     const activePage = document.querySelector('.page.active')?.id?.replace('page-', '');
     if (activePage === 'settings') { loadSettings(); loadWidgetSettings(); }
@@ -2780,8 +2793,10 @@
   // ── Widget Settings ─────────────────────────────────────────────────────────
 
   async function loadWidgetSettings() {
+    const resolvedClientId = resolveClientUuid(currentClientId) || currentClientId;
+    if (!resolvedClientId) return;
     try {
-      const data = await callApi('/client-settings-get', { client_id: currentClientId });
+      const data = await callApi('/client-settings-get', { client_id: resolvedClientId });
       const wc = data.widget_config || {};
       document.getElementById('wc-display-name').value  = wc.display_name  || '';
       document.getElementById('wc-brand-line').value    = wc.brand_line    || '';
@@ -2843,9 +2858,14 @@
       theme,
       starters:      starters.length ? starters : null,
     };
-    console.log('[Vault] saving widget config for client', currentClientId, widget_config);
+    const resolvedClientId = resolveClientUuid(currentClientId) || currentClientId;
+    if (!resolvedClientId) {
+      showToast('No client selected', 'error');
+      return;
+    }
+    console.log('[Vault] saving widget config for client', resolvedClientId, widget_config);
     try {
-      await callApi('/client-settings-save', { client_id: currentClientId, widget_config });
+      await callApi('/client-settings-save', { client_id: resolvedClientId, widget_config });
       showToast(`Widget config saved (theme: ${theme}) — live immediately`);
     } catch (e) {
       console.error('[Vault] save failed:', e);
@@ -2854,6 +2874,11 @@
   }
 
   async function saveNotificationSettings() {
+    const resolvedClientId = resolveClientUuid(currentClientId) || currentClientId;
+    if (!resolvedClientId) {
+      showToast('No client selected', 'error');
+      return;
+    }
     const notification_webhook = document.getElementById('wc-webhook').value.trim();
     const crmType = document.getElementById('wc-crm-type').value;
     const crm_config = { type: crmType };
@@ -2861,7 +2886,7 @@
       crm_config.access_token = document.getElementById('wc-hubspot-token').value.trim();
     }
     try {
-      await callApi('/client-settings-save', { client_id: currentClientId, notification_webhook, crm_config });
+      await callApi('/client-settings-save', { client_id: resolvedClientId, notification_webhook, crm_config });
       showToast('Notification config saved');
     } catch (e) { showToast('Save failed: ' + e.message, 'error'); }
   }
