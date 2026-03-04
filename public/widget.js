@@ -333,7 +333,7 @@
         padding: 4px 0 4px;
         align-self: flex-start;
         width: 100%;
-        max-width: 270px;
+        max-width: 100%;
       }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
@@ -344,8 +344,9 @@
         font-size: 13px;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        white-space: normal !important;
-        width: 100%;
+        white-space: nowrap !important;
+        width: auto;
+        max-width: 100%;
         text-align: left;
         font-weight: 600;
         letter-spacing: 0.01em;
@@ -364,16 +365,14 @@
 
       /* ── Inline forms ──────────────────────────────────────────────────── */
       #echo-form-area {
-        padding: 10px 12px 12px;
-        background: ${msgAreaBg};
-        border-top: 1px solid ${borderColor};
+        display: none !important;
       }
       .echo-inline-form {
-        background: ${surfaceBg};
-        border: 1px solid ${borderColor};
-        border-radius: 14px;
-        padding: 12px;
-        box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 2px 0 0;
+        box-shadow: none;
         animation: echo-form-in 0.2s ease-out;
       }
       @keyframes echo-form-in {
@@ -412,6 +411,13 @@
         transition: border-color 0.15s, box-shadow 0.15s;
         background: ${inputBg};
         color: ${inputText};
+      }
+      .echo-form-msg .echo-bubble {
+        max-width: 85%;
+        padding: 12px;
+      }
+      .echo-form-msg .echo-msg-avatar {
+        margin-top: 4px;
       }
       .echo-inline-form input:focus {
         border-color: ${primary};
@@ -570,8 +576,6 @@
 
         <div id="echo-messages"></div>
 
-        <div id="echo-form-area" style="display:none;"></div>
-
         <div id="echo-input-row">
           <input id="echo-input" type="text" placeholder="Type a message…" autocomplete="off" />
           <button id="echo-send" aria-label="Send">
@@ -605,11 +609,11 @@
     const messagesEl = document.getElementById("echo-messages");
     const inputEl = document.getElementById("echo-input");
     const sendBtn = document.getElementById("echo-send");
-    const formAreaEl = document.getElementById("echo-form-area");
 
     let chatHistory = [];
     let isOpen = false;
     let hasOpened = false;
+    let activeFormMsgEl = null;
 
     // ── Rendering helpers ──
 
@@ -688,12 +692,31 @@
       );
     }
 
+    function clearActiveFormMessage() {
+      if (activeFormMsgEl && activeFormMsgEl.parentNode) {
+        activeFormMsgEl.remove();
+      }
+      activeFormMsgEl = null;
+    }
+
+    function mountFormAsMessage(formHtml) {
+      clearActiveFormMessage();
+      const row = document.createElement("div");
+      row.className = "echo-msg echo-bot echo-form-msg";
+      row.innerHTML = `
+        <div class="echo-msg-avatar">${orbitSVG(28)}</div>
+        <div class="echo-bubble">${formHtml}</div>`;
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      activeFormMsgEl = row;
+      return row;
+    }
+
     // ── Forms ──
 
     function showContactForm() {
       clearQuickReplies();
-      formAreaEl.style.display = "block";
-      formAreaEl.innerHTML = `
+      const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
           <p class="echo-inline-form-title">Share your details</p>
           <p class="echo-inline-form-subtitle">We’ll follow up quickly and keep this concise.</p>
@@ -707,20 +730,19 @@
             <button class="echo-btn-primary" id="echo-cf-submit">Send →</button>
             <button class="echo-btn-secondary" id="echo-cf-cancel">Cancel</button>
           </div>
-        </div>`;
+        </div>`);
 
-      document.getElementById("echo-cf-cancel").onclick = () => {
-        formAreaEl.style.display = "none";
-        formAreaEl.innerHTML = "";
+      formMsg.querySelector("#echo-cf-cancel").onclick = () => {
+        clearActiveFormMessage();
       };
 
-      const contactNameInput = document.getElementById("echo-cf-name");
+      const contactNameInput = formMsg.querySelector("#echo-cf-name");
       if (contactNameInput) contactNameInput.focus();
 
-      document.getElementById("echo-cf-submit").onclick = async () => {
-        const name = document.getElementById("echo-cf-name").value.trim();
-        const email = document.getElementById("echo-cf-email").value.trim();
-        const phone = document.getElementById("echo-cf-phone").value.trim();
+      formMsg.querySelector("#echo-cf-submit").onclick = async () => {
+        const name = formMsg.querySelector("#echo-cf-name").value.trim();
+        const email = formMsg.querySelector("#echo-cf-email").value.trim();
+        const phone = formMsg.querySelector("#echo-cf-phone").value.trim();
         if (!name || !email) {
           addMsg(
             "Please enter both your name and email so I can submit this.",
@@ -729,8 +751,7 @@
           return;
         }
 
-        formAreaEl.style.display = "none";
-        formAreaEl.innerHTML = "";
+        clearActiveFormMessage();
         addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, "bot");
 
         try {
@@ -757,8 +778,7 @@
 
     function showEscalationForm() {
       clearQuickReplies();
-      formAreaEl.style.display = "block";
-      formAreaEl.innerHTML = `
+      const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
           <p class="echo-inline-form-title">Create support ticket</p>
           <p class="echo-inline-form-subtitle">We’ll route this to the team and confirm by email.</p>
@@ -772,27 +792,25 @@
             <button class="echo-btn-primary" id="echo-ef-submit">Submit ticket →</button>
             <button class="echo-btn-secondary" id="echo-ef-cancel">Cancel</button>
           </div>
-        </div>`;
+        </div>`);
 
-      document.getElementById("echo-ef-cancel").onclick = () => {
-        formAreaEl.style.display = "none";
-        formAreaEl.innerHTML = "";
+      formMsg.querySelector("#echo-ef-cancel").onclick = () => {
+        clearActiveFormMessage();
       };
 
-      const escalationNameInput = document.getElementById("echo-ef-name");
+      const escalationNameInput = formMsg.querySelector("#echo-ef-name");
       if (escalationNameInput) escalationNameInput.focus();
 
-      document.getElementById("echo-ef-submit").onclick = async () => {
-        const name = document.getElementById("echo-ef-name").value.trim();
-        const email = document.getElementById("echo-ef-email").value.trim();
-        const phone = document.getElementById("echo-ef-phone").value.trim();
+      formMsg.querySelector("#echo-ef-submit").onclick = async () => {
+        const name = formMsg.querySelector("#echo-ef-name").value.trim();
+        const email = formMsg.querySelector("#echo-ef-email").value.trim();
+        const phone = formMsg.querySelector("#echo-ef-phone").value.trim();
         if (!name || !email) {
           addMsg("Please fill in your name and email.", "bot");
           return;
         }
 
-        formAreaEl.style.display = "none";
-        formAreaEl.innerHTML = "";
+        clearActiveFormMessage();
         addMsg(
           `Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`,
           "bot",
@@ -824,8 +842,7 @@
     async function sendMessage(text) {
       if (!text.trim()) return;
       clearQuickReplies();
-      formAreaEl.style.display = "none";
-      formAreaEl.innerHTML = "";
+      clearActiveFormMessage();
 
       addMsg(text, "user");
       chatHistory.push({ role: "user", content: text });
