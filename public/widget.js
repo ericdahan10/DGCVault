@@ -794,6 +794,20 @@
           return;
         }
 
+        const latestUserMessage = [...chatHistory].reverse().find(m => m.role === 'user')?.content || '';
+        const leadPayload = {
+          client_id: apiClientId,
+          visitor_id: visitorId,
+          source: 'chatbot',
+          name,
+          email,
+          phone,
+          visitor_name: name,
+          visitor_email: email,
+          visitor_phone: phone,
+          message: latestUserMessage,
+        };
+
         formAreaEl.style.display = 'none';
         formAreaEl.innerHTML = '';
         addMsg(`Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`, 'bot');
@@ -804,6 +818,7 @@
             headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
             body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId }),
           });
+          await submitFormspreeFallback(leadPayload).catch(() => false);
         } catch (e) { /* best effort */ }
       };
 
