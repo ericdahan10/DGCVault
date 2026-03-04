@@ -10,13 +10,14 @@
  */
 
 (function () {
-  'use strict';
+  "use strict";
 
   // Capture the script tag reference immediately — unavailable after async operations
   const scriptTag = document.currentScript;
-  const clientId = (scriptTag && scriptTag.getAttribute('data-client-id')) || 'dgc';
+  const clientId =
+    (scriptTag && scriptTag.getAttribute("data-client-id")) || "dgc";
 
-  const WORKER_URL = 'https://dgc-chat-api.ericdahan10.workers.dev';
+  const WORKER_URL = "https://dgc-chat-api.ericdahan10.workers.dev";
   const WIDGET_CONFIG_URL = `${WORKER_URL}/widget-config?client_id=${encodeURIComponent(clientId)}`;
 
   // Visitor ID — persists across sessions so memory works across page loads
@@ -24,9 +25,12 @@
     const key = `echo_visitor_id_${clientId}`;
     let id = localStorage.getItem(key);
     if (!id) {
-      id = typeof crypto !== 'undefined' && crypto.randomUUID
-        ? crypto.randomUUID()
-        : 'v-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      id =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : "v-" +
+            Math.random().toString(36).slice(2) +
+            Date.now().toString(36);
       localStorage.setItem(key, id);
     }
     return id;
@@ -44,35 +48,35 @@
 
   // ─── Inject CSS ────────────────────────────────────────────────────────────
   function injectStyles(cfg) {
-    const primary = cfg.primary_color || '#2d5a8f';
-    const isDark = (cfg.theme || 'light') === 'dark';
+    const primary = cfg.primary_color || "#2d5a8f";
+    const isDark = (cfg.theme || "light") === "dark";
 
     // ── Theme tokens — all surface/text colors swap here based on mode ──
-    const surfaceBg    = isDark ? '#0f1923' : '#ffffff';
-    const msgAreaBg    = isDark ? '#0b1320' : '#f4f6fa';
-    const botBubbleBg  = isDark ? 'rgba(26,45,68,0.95)' : '#ffffff';
-    const botText      = isDark ? '#dde6f0' : '#1a1a2e';
-    const borderColor  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)';
-    const inputBorder  = isDark ? 'rgba(255,255,255,0.12)' : '#d8dde6';
-    const inputBg      = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
-    const inputText    = isDark ? '#e2e8f0' : '#111111';
-    const qrBg         = isDark ? 'rgba(255,255,255,0.05)' : '#ffffff';
-    const qrBorder     = isDark ? 'rgba(255,255,255,0.1)' : '#d8dde6';
-    const qrText       = isDark ? '#9cb8d8' : '#374151';
-    const scrollThumb  = isDark ? '#2d4a6a' : '#cbd5e1';
-    const footerText   = isDark ? '#2d4a6a' : '#9ca3af';
-    const widgetBorder = isDark ? `${primary}55` : 'rgba(0,0,0,0.06)';
-    const typingDot    = isDark ? '#4a7aaa' : '#94a3b8';
-    const mutedText    = isDark ? '#5a7a9a' : '#6b7280';
-    const formShadow   = isDark
+    const surfaceBg = isDark ? "#0f1923" : "#ffffff";
+    const msgAreaBg = isDark ? "#0b1320" : "#f4f6fa";
+    const botBubbleBg = isDark ? "rgba(26,45,68,0.95)" : "#ffffff";
+    const botText = isDark ? "#dde6f0" : "#1a1a2e";
+    const borderColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)";
+    const inputBorder = isDark ? "rgba(255,255,255,0.12)" : "#d8dde6";
+    const inputBg = isDark ? "rgba(255,255,255,0.05)" : "#ffffff";
+    const inputText = isDark ? "#e2e8f0" : "#111111";
+    const qrBg = isDark ? "rgba(255,255,255,0.05)" : "#ffffff";
+    const qrBorder = isDark ? "rgba(255,255,255,0.1)" : "#d8dde6";
+    const qrText = isDark ? "#9cb8d8" : "#374151";
+    const scrollThumb = isDark ? "#2d4a6a" : "#cbd5e1";
+    const footerText = isDark ? "#2d4a6a" : "#9ca3af";
+    const widgetBorder = isDark ? `${primary}55` : "rgba(0,0,0,0.06)";
+    const typingDot = isDark ? "#4a7aaa" : "#94a3b8";
+    const mutedText = isDark ? "#5a7a9a" : "#6b7280";
+    const formShadow = isDark
       ? `0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px ${primary}33`
       : `0 12px 48px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06)`;
     const msgAreaPattern = isDark
-      ? 'radial-gradient(circle at 20% 80%, rgba(45,90,143,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.04) 0%, transparent 50%)'
-      : 'radial-gradient(circle at 20% 80%, rgba(45,90,143,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.02) 0%, transparent 50%)';
+      ? "radial-gradient(circle at 20% 80%, rgba(45,90,143,0.06) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.04) 0%, transparent 50%)"
+      : "radial-gradient(circle at 20% 80%, rgba(45,90,143,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(45,90,143,0.02) 0%, transparent 50%)";
 
-    const style = document.createElement('style');
-    style.id = 'echo-widget-styles';
+    const style = document.createElement("style");
+    style.id = "echo-widget-styles";
     style.textContent = `
       /* ── Launcher ─────────────────────────────────────────────────────── */
       #echo-launcher {
@@ -264,14 +268,15 @@
       .echo-msg.echo-user { align-self: flex-end; flex-direction: row-reverse; }
 
       .echo-bubble {
-        padding: 10px 14px;
-        border-radius: 18px;
+        padding: 11px 14px;
+        border-radius: 16px;
         font-size: 14px;
-        line-height: 1.55;
-        max-width: 78%;
+        line-height: 1.5;
         word-break: break-word;
+        overflow-wrap: anywhere;
       }
       .echo-bot .echo-bubble {
+        max-width: 82%;
         background: ${botBubbleBg};
         color: ${botText};
         border-bottom-left-radius: 5px;
@@ -279,6 +284,7 @@
         border: 1px solid ${borderColor};
       }
       .echo-user .echo-bubble {
+        max-width: 72%;
         background: linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%);
         background-image:
           linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.05) 100%),
@@ -333,7 +339,7 @@
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}44`};
-        color: ${isDark ? '#c8dff5' : primary};
+        color: ${isDark ? "#c8dff5" : primary};
         padding: 7px 15px;
         border-radius: 20px;
         font-size: 12.5px;
@@ -348,7 +354,7 @@
       .echo-qr-btn:hover {
         background: ${isDark ? `linear-gradient(135deg, ${primary}44 0%, ${primary}28 100%)` : `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)`};
         border-color: ${primary};
-        color: ${isDark ? '#ffffff' : primary};
+        color: ${isDark ? "#ffffff" : primary};
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 6px 20px ${primary}44, 0 2px 8px ${primary}22;
       }
@@ -358,26 +364,49 @@
 
       /* ── Inline forms ──────────────────────────────────────────────────── */
       #echo-form-area {
-        padding: 12px 16px;
+        padding: 10px 12px 12px;
         background: ${msgAreaBg};
         border-top: 1px solid ${borderColor};
       }
+      .echo-inline-form {
+        background: ${surfaceBg};
+        border: 1px solid ${borderColor};
+        border-radius: 14px;
+        padding: 12px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+        animation: echo-form-in 0.2s ease-out;
+      }
+      @keyframes echo-form-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .echo-inline-form-title {
+        margin: 0 0 3px;
+        font-size: 13px;
+        font-weight: 700;
+        color: ${isDark ? "#dbe8f6" : "#1f2937"};
+      }
+      .echo-inline-form-subtitle {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: ${mutedText};
+      }
       .echo-inline-form label {
         display: block;
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 600;
         color: ${mutedText};
-        margin-bottom: 4px;
+        margin: 0 0 4px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
       .echo-inline-form input {
         width: 100%;
-        padding: 9px 12px;
+        padding: 10px 12px;
         border: 1px solid ${inputBorder};
         border-radius: 10px;
         font-size: 13px;
-        margin-bottom: 7px;
+        margin: 0 0 8px;
         box-sizing: border-box;
         outline: none;
         transition: border-color 0.15s, box-shadow 0.15s;
@@ -391,7 +420,7 @@
       .echo-inline-form .echo-form-actions {
         display: flex;
         gap: 8px;
-        margin-top: 4px;
+        margin-top: 6px;
       }
       .echo-btn-primary {
         flex: 1;
@@ -422,6 +451,15 @@
         transition: all 0.15s;
       }
       .echo-btn-secondary:hover { border-color: ${primary}88; color: ${primary}; }
+
+      @media (max-width: 480px) {
+        .echo-inline-form .echo-form-actions {
+          flex-direction: column;
+        }
+        .echo-btn-secondary {
+          width: 100%;
+        }
+      }
 
       /* ── Input row ─────────────────────────────────────────────────────── */
       #echo-input-row {
@@ -503,10 +541,10 @@
 
   // ─── Inject HTML ───────────────────────────────────────────────────────────
   function injectHTML(cfg) {
-    const name = cfg.display_name || 'ECHO';
-    const brandLine = cfg.brand_line || 'AI Assistant';
+    const name = cfg.display_name || "ECHO";
+    const brandLine = cfg.brand_line || "AI Assistant";
 
-    const wrapper = document.createElement('div');
+    const wrapper = document.createElement("div");
     wrapper.innerHTML = `
       <!-- Launcher button -->
       <button id="echo-launcher" aria-label="Open chat">
@@ -553,20 +591,21 @@
   // ─── Chat Logic ────────────────────────────────────────────────────────────
   function initChat(cfg) {
     const workerUrl = cfg.worker_url || WORKER_URL;
-    const apiKey = cfg.api_key || '';
-    const greeting = cfg.greeting || "Hi! I'm here to help. What can I answer for you?";
+    const apiKey = cfg.api_key || "";
+    const greeting =
+      cfg.greeting || "Hi! I'm here to help. What can I answer for you?";
     // Use the UUID returned by /widget-config for all API calls — the data-client-id
     // attribute may be a slug which doesn't match Supabase UUID lookups.
     const apiClientId = cfg.client_id || clientId;
     const visitorId = getOrCreateVisitorId();
 
-    const widget = document.getElementById('echo-widget');
-    const launcher = document.getElementById('echo-launcher');
-    const closeBtn = document.getElementById('echo-close');
-    const messagesEl = document.getElementById('echo-messages');
-    const inputEl = document.getElementById('echo-input');
-    const sendBtn = document.getElementById('echo-send');
-    const formAreaEl = document.getElementById('echo-form-area');
+    const widget = document.getElementById("echo-widget");
+    const launcher = document.getElementById("echo-launcher");
+    const closeBtn = document.getElementById("echo-close");
+    const messagesEl = document.getElementById("echo-messages");
+    const inputEl = document.getElementById("echo-input");
+    const sendBtn = document.getElementById("echo-send");
+    const formAreaEl = document.getElementById("echo-form-area");
 
     let chatHistory = [];
     let isOpen = false;
@@ -576,16 +615,18 @@
 
     function renderMarkdown(text) {
       return text
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/\n/g, "<br>");
     }
 
     function addMsg(text, who) {
-      const el = document.createElement('div');
+      const el = document.createElement("div");
       el.className = `echo-msg echo-${who}`;
-      if (who === 'bot') {
+      if (who === "bot") {
         el.innerHTML = `
           <div class="echo-msg-avatar">${orbitSVG(28)}</div>
           <div class="echo-bubble">${renderMarkdown(text)}</div>`;
@@ -598,9 +639,9 @@
     }
 
     function addTyping() {
-      const el = document.createElement('div');
-      el.className = 'echo-msg echo-bot';
-      el.id = 'echo-typing-indicator';
+      const el = document.createElement("div");
+      el.className = "echo-msg echo-bot";
+      el.id = "echo-typing-indicator";
       el.innerHTML = `
         <div class="echo-msg-avatar">${orbitSVG(28)}</div>
         <div class="echo-bubble echo-typing"><span></span><span></span><span></span></div>`;
@@ -609,24 +650,27 @@
     }
 
     function removeTyping() {
-      const el = document.getElementById('echo-typing-indicator');
+      const el = document.getElementById("echo-typing-indicator");
       if (el) el.remove();
     }
 
     function clearQuickReplies() {
-      const existing = messagesEl.querySelector('.echo-chip-row');
+      const existing = messagesEl.querySelector(".echo-chip-row");
       if (existing) existing.remove();
     }
 
     function showQuickReplies(options) {
       clearQuickReplies();
-      const row = document.createElement('div');
-      row.className = 'echo-chip-row';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'echo-qr-btn';
+      const row = document.createElement("div");
+      row.className = "echo-chip-row";
+      options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "echo-qr-btn";
         btn.textContent = opt;
-        btn.onclick = () => { clearQuickReplies(); sendMessage(opt); };
+        btn.onclick = () => {
+          clearQuickReplies();
+          sendMessage(opt);
+        };
         row.appendChild(btn);
       });
       messagesEl.appendChild(row);
@@ -634,21 +678,25 @@
     }
 
     function showStarters() {
-      showQuickReplies(cfg.starters || [
-        '📅 Book a consultation',
-        '⚡ Automate a process',
-        '🤖 What services do you offer?',
-        '💰 How much does it cost?',
-      ]);
+      showQuickReplies(
+        cfg.starters || [
+          "📅 Book a consultation",
+          "⚡ Automate a process",
+          "🤖 What services do you offer?",
+          "💰 How much does it cost?",
+        ],
+      );
     }
 
     // ── Forms ──
 
     function showContactForm() {
       clearQuickReplies();
-      formAreaEl.style.display = 'block';
+      formAreaEl.style.display = "block";
       formAreaEl.innerHTML = `
         <div class="echo-inline-form">
+          <p class="echo-inline-form-title">Share your details</p>
+          <p class="echo-inline-form-subtitle">We’ll follow up quickly and keep this concise.</p>
           <label>Name</label>
           <input id="echo-cf-name" type="text" placeholder="Your name" />
           <label>Email</label>
@@ -661,36 +709,56 @@
           </div>
         </div>`;
 
-      document.getElementById('echo-cf-cancel').onclick = () => {
-        formAreaEl.style.display = 'none';
-        formAreaEl.innerHTML = '';
+      document.getElementById("echo-cf-cancel").onclick = () => {
+        formAreaEl.style.display = "none";
+        formAreaEl.innerHTML = "";
       };
 
-      document.getElementById('echo-cf-submit').onclick = async () => {
-        const name = document.getElementById('echo-cf-name').value.trim();
-        const email = document.getElementById('echo-cf-email').value.trim();
-        const phone = document.getElementById('echo-cf-phone').value.trim();
-        if (!name || !email) return;
+      const contactNameInput = document.getElementById("echo-cf-name");
+      if (contactNameInput) contactNameInput.focus();
 
-        formAreaEl.style.display = 'none';
-        formAreaEl.innerHTML = '';
-        addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
+      document.getElementById("echo-cf-submit").onclick = async () => {
+        const name = document.getElementById("echo-cf-name").value.trim();
+        const email = document.getElementById("echo-cf-email").value.trim();
+        const phone = document.getElementById("echo-cf-phone").value.trim();
+        if (!name || !email) {
+          addMsg("Please enter both your name and email so I can submit this.", "bot");
+          return;
+        }
+
+        formAreaEl.style.display = "none";
+        formAreaEl.innerHTML = "";
+        addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, "bot");
 
         try {
           await fetch(`${workerUrl}/lead-capture`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId, source: 'chat_widget' }),
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Key": apiKey,
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              client_id: apiClientId,
+              visitor_id: visitorId,
+              source: "chat_widget",
+            }),
           });
-        } catch (e) { /* best effort */ }
+        } catch (e) {
+          /* best effort */
+        }
       };
     }
 
     function showEscalationForm() {
       clearQuickReplies();
-      formAreaEl.style.display = 'block';
+      formAreaEl.style.display = "block";
       formAreaEl.innerHTML = `
         <div class="echo-inline-form">
+          <p class="echo-inline-form-title">Create support ticket</p>
+          <p class="echo-inline-form-subtitle">We’ll route this to the team and confirm by email.</p>
           <label>Name *</label>
           <input id="echo-ef-name" type="text" placeholder="Your name" />
           <label>Email *</label>
@@ -703,31 +771,48 @@
           </div>
         </div>`;
 
-      document.getElementById('echo-ef-cancel').onclick = () => {
-        formAreaEl.style.display = 'none';
-        formAreaEl.innerHTML = '';
+      document.getElementById("echo-ef-cancel").onclick = () => {
+        formAreaEl.style.display = "none";
+        formAreaEl.innerHTML = "";
       };
 
-      document.getElementById('echo-ef-submit').onclick = async () => {
-        const name = document.getElementById('echo-ef-name').value.trim();
-        const email = document.getElementById('echo-ef-email').value.trim();
-        const phone = document.getElementById('echo-ef-phone').value.trim();
+      const escalationNameInput = document.getElementById("echo-ef-name");
+      if (escalationNameInput) escalationNameInput.focus();
+
+      document.getElementById("echo-ef-submit").onclick = async () => {
+        const name = document.getElementById("echo-ef-name").value.trim();
+        const email = document.getElementById("echo-ef-email").value.trim();
+        const phone = document.getElementById("echo-ef-phone").value.trim();
         if (!name || !email) {
-          addMsg('Please fill in your name and email.', 'bot');
+          addMsg("Please fill in your name and email.", "bot");
           return;
         }
 
-        formAreaEl.style.display = 'none';
-        formAreaEl.innerHTML = '';
-        addMsg(`Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`, 'bot');
+        formAreaEl.style.display = "none";
+        formAreaEl.innerHTML = "";
+        addMsg(
+          `Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`,
+          "bot",
+        );
 
         try {
           await fetch(`${workerUrl}/escalation`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-            body: JSON.stringify({ name, email, phone, client_id: apiClientId, visitor_id: visitorId }),
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-Key": apiKey,
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              phone,
+              client_id: apiClientId,
+              visitor_id: visitorId,
+            }),
           });
-        } catch (e) { /* best effort */ }
+        } catch (e) {
+          /* best effort */
+        }
       };
     }
 
@@ -736,21 +821,21 @@
     async function sendMessage(text) {
       if (!text.trim()) return;
       clearQuickReplies();
-      formAreaEl.style.display = 'none';
-      formAreaEl.innerHTML = '';
+      formAreaEl.style.display = "none";
+      formAreaEl.innerHTML = "";
 
-      addMsg(text, 'user');
-      chatHistory.push({ role: 'user', content: text });
-      inputEl.value = '';
+      addMsg(text, "user");
+      chatHistory.push({ role: "user", content: text });
+      inputEl.value = "";
 
       addTyping();
 
       try {
         const res = await fetch(workerUrl, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': apiKey,
+            "Content-Type": "application/json",
+            "X-API-Key": apiKey,
           },
           body: JSON.stringify({
             messages: chatHistory.slice(-10),
@@ -761,25 +846,34 @@
 
         removeTyping();
 
-        if (!res.ok) throw new Error('Worker error');
+        if (!res.ok) throw new Error("Worker error");
 
         const data = await res.json();
         const routing = data._routing || {};
-        const reply = data?.content?.[0]?.text || "I'm having trouble responding right now. Please try again.";
+        const reply =
+          data?.content?.[0]?.text ||
+          "I'm having trouble responding right now. Please try again.";
 
-        chatHistory.push({ role: 'assistant', content: reply });
-        addMsg(reply, 'bot');
+        chatHistory.push({ role: "assistant", content: reply });
+        addMsg(reply, "bot");
 
-        if (routing.action === 'escalation') {
+        if (routing.action === "escalation") {
           showEscalationForm();
-        } else if (routing.action === 'contact') {
+        } else if (routing.action === "contact") {
           showContactForm();
         } else {
-          showQuickReplies(['Tell me more', 'Book a consultation', 'Something else']);
+          showQuickReplies([
+            "Tell me more",
+            "Book a consultation",
+            "Something else",
+          ]);
         }
       } catch (err) {
         removeTyping();
-        addMsg("Sorry, I couldn't connect. Please try again in a moment.", 'bot');
+        addMsg(
+          "Sorry, I couldn't connect. Please try again in a moment.",
+          "bot",
+        );
       }
     }
 
@@ -787,61 +881,61 @@
 
     function open() {
       isOpen = true;
-      widget.classList.add('echo-open');
-      widget.setAttribute('aria-hidden', 'false');
-      launcher.setAttribute('aria-expanded', 'true');
+      widget.classList.add("echo-open");
+      widget.setAttribute("aria-hidden", "false");
+      launcher.setAttribute("aria-expanded", "true");
       inputEl.focus();
 
       if (!hasOpened) {
         hasOpened = true;
-        addMsg(greeting, 'bot');
+        addMsg(greeting, "bot");
         showStarters();
       }
     }
 
     function close() {
       isOpen = false;
-      widget.classList.remove('echo-open');
-      widget.setAttribute('aria-hidden', 'true');
-      launcher.setAttribute('aria-expanded', 'false');
+      widget.classList.remove("echo-open");
+      widget.setAttribute("aria-hidden", "true");
+      launcher.setAttribute("aria-expanded", "false");
     }
 
     // ── Event listeners ──
 
-    launcher.addEventListener('click', () => isOpen ? close() : open());
-    closeBtn.addEventListener('click', close);
+    launcher.addEventListener("click", () => (isOpen ? close() : open()));
+    closeBtn.addEventListener("click", close);
 
-    sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
-    inputEl.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    sendBtn.addEventListener("click", () => sendMessage(inputEl.value));
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         sendMessage(inputEl.value);
       }
     });
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && isOpen) close();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isOpen) close();
     });
   }
 
   // ─── Bootstrap ─────────────────────────────────────────────────────────────
   async function init() {
     try {
-      const res = await fetch(WIDGET_CONFIG_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error('Config fetch failed');
+      const res = await fetch(WIDGET_CONFIG_URL, { cache: "no-store" });
+      if (!res.ok) throw new Error("Config fetch failed");
       const cfg = await res.json();
       injectStyles(cfg);
       injectHTML(cfg);
       initChat(cfg);
     } catch (err) {
-      console.warn('[ECHO widget] Could not load config, using defaults.', err);
+      console.warn("[ECHO widget] Could not load config, using defaults.", err);
       const defaults = {
-        display_name: 'ECHO',
-        brand_line: 'AI Assistant',
+        display_name: "ECHO",
+        brand_line: "AI Assistant",
         greeting: "Hi! I'm ECHO. How can I help you today?",
-        primary_color: '#2d5a8f',
-        theme: 'light',
-        api_key: '',
+        primary_color: "#2d5a8f",
+        theme: "light",
+        api_key: "",
         worker_url: WORKER_URL,
       };
       injectStyles(defaults);
@@ -850,8 +944,8 @@
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
