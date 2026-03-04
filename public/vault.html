@@ -2078,7 +2078,7 @@
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
           overflow: visible;
           padding-bottom: 0;
           scrollbar-width: none;
@@ -2092,7 +2092,7 @@
         #app .nav-links {
           display: flex;
           flex-wrap: wrap;
-          gap: 6px;
+          gap: 7px;
           flex: 1 1 auto;
           min-width: 0;
         }
@@ -2167,36 +2167,46 @@
 
         #app .top-nav {
           padding: 8px 10px;
-          gap: 8px;
+          gap: 10px;
         }
         #app .top-nav > svg {
           width: 128px;
           height: auto;
         }
         #app .top-nav > div {
-          flex-direction: column;
-          align-items: stretch;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
           gap: 8px;
         }
         #client-selector {
-          width: 100%;
+          order: 1;
+          width: auto;
           min-width: 0 !important;
+          flex: 1 1 180px;
           font-size: 12px !important;
           padding: 8px 10px !important;
         }
         #app .nav-links {
+          order: 3;
           width: 100%;
           flex-wrap: nowrap;
           overflow-x: auto;
-          padding-bottom: 2px;
+          padding: 4px;
+          border: 1px solid #2a3d5c;
+          border-radius: 10px;
+          background: rgba(20, 28, 40, 0.55);
           scrollbar-width: none;
         }
         #app .nav-links::-webkit-scrollbar {
           display: none;
         }
         #app .top-nav > div > .nav-logout {
-          width: 100%;
+          order: 2;
+          width: auto;
           margin-left: 0;
+          flex: 0 0 auto;
         }
         #app .nav-link,
         #app .nav-logout {
@@ -2204,8 +2214,37 @@
           padding: 7px 10px;
           font-size: 11px;
         }
+        #app .nav-link {
+          border: 1px solid transparent;
+        }
+        #app .nav-logout {
+          border-color: #2a3d5c;
+          color: #8ea5be;
+        }
         #app .app-body {
-          padding-top: 186px;
+          padding-top: 162px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #app .top-nav {
+          padding: 8px;
+        }
+        #app .top-nav > svg {
+          width: 118px;
+        }
+        #client-selector {
+          flex-basis: 150px;
+          font-size: 11px !important;
+        }
+        #app .nav-link,
+        #app .nav-logout {
+          font-size: 10px;
+          padding: 6px 9px;
+          min-height: 32px;
+        }
+        #app .app-body {
+          padding-top: 154px;
         }
 
         .login-card {
