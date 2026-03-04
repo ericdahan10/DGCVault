@@ -725,7 +725,7 @@
         const leadPayload = {
           client_id: apiClientId,
           visitor_id: visitorId,
-          source: 'chatbot',
+          source: 'chat_widget',
           name,
           email,
           phone,
@@ -798,7 +798,7 @@
         const leadPayload = {
           client_id: apiClientId,
           visitor_id: visitorId,
-          source: 'chatbot',
+          source: 'chat_widget',
           name,
           email,
           phone,
