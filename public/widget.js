@@ -137,8 +137,8 @@
         position: fixed;
         bottom: 100px;
         right: 24px;
-        width: 390px;
-        max-width: calc(100vw - 32px);
+        width: 460px;
+        max-width: calc(100vw - 24px);
         height: 590px;
         max-height: calc(100vh - 120px);
         background: ${surfaceBg};
@@ -341,9 +341,9 @@
         gap: 8px;
         overflow: visible;
         padding: 4px 0 4px;
-        align-self: flex-start;
-        width: 100%;
-        max-width: 100%;
+        align-self: flex-end;
+        width: auto;
+        max-width: 78%;
       }
       .echo-qr-btn {
         background: ${isDark ? `linear-gradient(135deg, ${primary}22 0%, ${primary}12 100%)` : `linear-gradient(135deg, ${primary}0f 0%, ${primary}06 100%)`};
@@ -421,16 +421,6 @@
         border: 1px solid ${isDark ? `${primary}55` : `${primary}40`};
         box-shadow: 0 12px 30px ${primary}24, inset 0 1px 0 rgba(255,255,255,0.06);
         position: relative;
-      }
-      .echo-form-msg .echo-bubble::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        border-radius: 14px 14px 0 0;
-        background: linear-gradient(90deg, ${primary}dd, ${primary}55);
       }
       .echo-form-msg .echo-msg-avatar {
         margin-top: 4px;
@@ -647,8 +637,14 @@
     function addMsg(text, who) {
       const el = document.createElement("div");
       el.className = `echo-msg echo-${who}`;
-      const normalized = String(text || "").replace(/\s+/g, " ").trim();
-      if (who === "user" && normalized.length <= 26 && !normalized.includes("\n")) {
+      const normalized = String(text || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (
+        who === "user" &&
+        normalized.length <= 26 &&
+        !normalized.includes("\n")
+      ) {
         el.classList.add("echo-short");
       }
       if (who === "bot") {
@@ -691,7 +687,9 @@
       options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "echo-qr-btn";
-        const cleanOpt = String(opt || "").replace(/\s+/g, " ").trim();
+        const cleanOpt = String(opt || "")
+          .replace(/\s+/g, " ")
+          .trim();
         btn.textContent = cleanOpt;
         btn.onclick = () => {
           clearQuickReplies();
