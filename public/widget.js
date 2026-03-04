@@ -424,15 +424,19 @@
         color: ${inputText};
       }
       .echo-form-msg .echo-bubble {
-        max-width: 84%;
+        max-width: min(92%, 560px);
+        width: min(92%, 560px);
         padding: 8px;
         background: ${isDark ? "linear-gradient(160deg, rgba(30,48,74,0.96), rgba(20,34,53,0.96))" : "linear-gradient(160deg, #ffffff, #f8fbff)"};
         border: 1px solid ${isDark ? `${primary}55` : `${primary}40`};
         box-shadow: 0 12px 30px ${primary}24, inset 0 1px 0 rgba(255,255,255,0.06);
         position: relative;
+        margin: 0 auto;
       }
-      .echo-form-msg .echo-msg-avatar {
-        margin-top: 4px;
+      .echo-msg.echo-form-msg {
+        align-self: center;
+        width: 100%;
+        justify-content: center;
       }
       .echo-inline-form input:focus {
         border-color: ${primary};
@@ -731,9 +735,8 @@
     function mountFormAsMessage(formHtml) {
       clearActiveFormMessage();
       const row = document.createElement("div");
-      row.className = "echo-msg echo-bot echo-form-msg";
+      row.className = "echo-msg echo-form-msg";
       row.innerHTML = `
-        <div class="echo-msg-avatar">${orbitSVG(28)}</div>
         <div class="echo-bubble">${formHtml}</div>`;
       messagesEl.appendChild(row);
       messagesEl.scrollTop = messagesEl.scrollHeight;
