@@ -401,12 +401,28 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .echo-inline-form-heading {
-        margin: 0 0 10px;
+      .echo-form-title {
+        margin: 0 0 12px;
         font-size: 14px;
-        font-weight: 700;
-        color: ${isDark ? "#dce9f8" : "#1f2f45"};
-        letter-spacing: 0.01em;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        text-align: center;
+        text-transform: uppercase;
+        background: linear-gradient(90deg, ${isDark ? "#e4f0ff" : "#1f3f66"}, ${primary});
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+      }
+      .echo-form-title::after {
+        content: "";
+        display: block;
+        width: 46px;
+        height: 2px;
+        margin: 7px auto 0;
+        border-radius: 2px;
+        background: linear-gradient(90deg, ${primary}cc, ${primary}55);
       }
       .echo-inline-form label {
         display: block;
@@ -756,17 +772,19 @@
     function showContactForm() {
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
-        <div class="echo-inline-form">
-          <p class="echo-inline-form-heading">Get in touch</p>
-          <label>Name</label>
-          <input id="echo-cf-name" type="text" placeholder="Your name" />
-          <label>Email</label>
-          <input id="echo-cf-email" type="email" placeholder="you@email.com" />
-          <label>Phone (optional)</label>
-          <input id="echo-cf-phone" type="tel" placeholder="Phone (optional)" />
-          <div class="echo-form-actions">
-            <button class="echo-btn-primary" id="echo-cf-submit">Send →</button>
-            <button class="echo-btn-secondary" id="echo-cf-cancel">Cancel</button>
+        <div class="echo-form-shell">
+          <p class="echo-form-title">Get in Touch</p>
+          <div class="echo-inline-form">
+            <label>Name</label>
+            <input id="echo-cf-name" type="text" placeholder="Your name" />
+            <label>Email</label>
+            <input id="echo-cf-email" type="email" placeholder="you@email.com" />
+            <label>Phone (optional)</label>
+            <input id="echo-cf-phone" type="tel" placeholder="Phone (optional)" />
+            <div class="echo-form-actions">
+              <button class="echo-btn-primary" id="echo-cf-submit">Send →</button>
+              <button class="echo-btn-secondary" id="echo-cf-cancel">Cancel</button>
+            </div>
           </div>
         </div>`);
 
@@ -817,17 +835,19 @@
     function showEscalationForm() {
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
-        <div class="echo-inline-form">
-          <p class="echo-inline-form-heading">submit a ticket</p>
-          <label>Name</label>
-          <input id="echo-ef-name" type="text" placeholder="Your name" />
-          <label>Email</label>
-          <input id="echo-ef-email" type="email" placeholder="you@email.com" />
-          <label>Phone (optional)</label>
-          <input id="echo-ef-phone" type="tel" placeholder="Phone (optional)" />
-          <div class="echo-form-actions">
-            <button class="echo-btn-primary" id="echo-ef-submit">Submit ticket →</button>
-            <button class="echo-btn-secondary" id="echo-ef-cancel">Cancel</button>
+        <div class="echo-form-shell">
+          <p class="echo-form-title">Submit a Ticket</p>
+          <div class="echo-inline-form">
+            <label>Name</label>
+            <input id="echo-ef-name" type="text" placeholder="Your name" />
+            <label>Email</label>
+            <input id="echo-ef-email" type="email" placeholder="you@email.com" />
+            <label>Phone (optional)</label>
+            <input id="echo-ef-phone" type="tel" placeholder="Phone (optional)" />
+            <div class="echo-form-actions">
+              <button class="echo-btn-primary" id="echo-ef-submit">Submit ticket →</button>
+              <button class="echo-btn-secondary" id="echo-ef-cancel">Cancel</button>
+            </div>
           </div>
         </div>`);
 
