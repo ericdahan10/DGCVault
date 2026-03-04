@@ -2081,6 +2081,28 @@
 
       /* ── Responsive ─────────────────────────────────────────────────────────── */
       @media (max-width: 980px) {
+        body {
+          overflow-x: hidden;
+        }
+
+        .app-content {
+          padding: 28px 18px;
+        }
+        .page-orb-stamp {
+          margin-bottom: 22px;
+          padding-bottom: 16px;
+        }
+        .page-title {
+          font-size: 24px;
+        }
+        .card {
+          padding: 18px 16px;
+          margin-bottom: 14px;
+        }
+        .card-title {
+          margin-bottom: 14px;
+        }
+
         #app .top-nav {
           height: auto;
           min-height: 64px;
@@ -2139,9 +2161,54 @@
       }
 
       @media (max-width: 700px) {
+        .app-content {
+          padding: 18px 12px;
+        }
+        .page-header {
+          margin-bottom: 18px;
+        }
+        .page-title {
+          font-size: 22px;
+        }
+        .page-desc {
+          font-size: 12px;
+          line-height: 1.5;
+        }
+        .page-orb-stamp {
+          gap: 10px;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+        }
+        .page-orb-stamp-vault {
+          font-size: 16px;
+        }
+        .page-orb-stamp-tag {
+          font-size: 8px;
+        }
+        .card {
+          padding: 14px 12px;
+          border-radius: 10px;
+        }
+        .card-title {
+          font-size: 10px;
+          margin-bottom: 12px;
+          padding-left: 9px;
+        }
+
         .stats-grid {
           grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
         }
+        .stat-card {
+          padding: 12px 10px;
+        }
+        .stat-label {
+          font-size: 10px;
+        }
+        .stat-value {
+          font-size: 20px;
+        }
+
         .charts-grid {
           grid-template-columns: 1fr;
         }
@@ -2157,20 +2224,101 @@
         .sources-grid {
           grid-template-columns: 1fr;
         }
+        .source-card {
+          padding: 14px 12px;
+        }
+        .source-card-header {
+          align-items: flex-start;
+        }
+        .source-card-name {
+          white-space: normal;
+          word-break: break-word;
+        }
+
         .form-row {
           grid-template-columns: 1fr;
         }
-        .app-content {
-          padding: 24px 16px;
+        .form-input,
+        .form-textarea {
+          font-size: 16px;
         }
+
         .tab-bar {
           grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+          margin-bottom: 16px;
         }
         .tab-btn {
-          padding: 16px 14px 14px;
+          padding: 12px 10px;
+          border-radius: 10px;
+        }
+        .tab-btn-icon {
+          margin-bottom: 8px;
         }
         .tab-btn-label {
+          font-size: 11px;
+          margin-bottom: 2px;
+        }
+        .tab-btn-desc {
+          font-size: 10px;
+          line-height: 1.4;
+        }
+
+        .kb-subnav {
+          width: 100%;
+          overflow-x: auto;
+          padding-bottom: 4px;
+          gap: 6px;
+        }
+        .kb-pill {
+          white-space: nowrap;
+          padding: 7px 11px;
+          font-size: 11px;
+        }
+
+        .leads-page-header {
+          flex-direction: column;
+          gap: 10px;
+        }
+        .leads-export-all-btn {
+          width: 100%;
+          text-align: center;
+        }
+        .lead-card {
+          padding: 12px 12px;
+          margin-bottom: 10px;
+        }
+        .lead-contact,
+        .lead-meta,
+        .lead-message,
+        .lead-interests {
           font-size: 12px;
+        }
+        .lead-actions {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 8px;
+        }
+        .lead-action-btns {
+          margin-left: 0;
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .lead-btn {
+          justify-content: center;
+          font-size: 11px;
+          padding: 7px 10px;
+        }
+
+        .ticket-filter-bar {
+          gap: 6px;
+          margin-bottom: 14px;
+        }
+        .ticket-filter-btn {
+          font-size: 11px;
+          padding: 6px 10px;
         }
         .source-confirm {
           flex-direction: column;
@@ -2178,12 +2326,54 @@
         }
         .ticket-card {
           flex-direction: column;
+          padding: 12px 12px;
+          gap: 10px;
         }
         .ticket-actions {
-          flex-direction: row;
-          align-items: center;
+          flex-direction: column;
+          align-items: stretch;
           width: 100%;
-          justify-content: space-between;
+          justify-content: flex-start;
+          gap: 8px;
+        }
+        .ticket-status-select {
+          width: 100%;
+          font-size: 12px;
+          padding: 7px 10px;
+        }
+        .ticket-action-btns {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .ticket-btn {
+          width: 100%;
+          text-align: center;
+          justify-content: center;
+          font-size: 11px;
+          padding: 7px 10px;
+        }
+
+        .convo-row {
+          padding: 10px 10px;
+          gap: 8px;
+        }
+        .convo-avatar {
+          width: 30px;
+          height: 30px;
+          font-size: 12px;
+        }
+        .drawer-header {
+          padding: 14px 14px 12px;
+        }
+        .drawer-messages {
+          padding: 14px;
+        }
+        .msg-bubble {
+          max-width: 90%;
+          font-size: 12px;
+          padding: 9px 10px;
         }
 
         #app .top-nav {
@@ -2206,10 +2396,16 @@
           justify-content: flex-start;
           flex-wrap: nowrap;
           gap: 8px;
+          position: absolute;
+          top: 64px;
+          left: 0;
+          right: 0;
           width: 100%;
-          margin-top: 4px;
-          padding-top: 8px;
+          padding: 10px;
           border-top: 1px solid #2a3d5c;
+          border-bottom: 1px solid #2a3d5c;
+          background: #1a1a1a;
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
         }
         #app .top-nav.mobile-open > div {
           display: flex;
@@ -2256,8 +2452,13 @@
         #app .app-body {
           padding-top: 64px;
         }
-        #app .top-nav.mobile-open + .app-body {
-          padding-top: 258px;
+
+        #toast {
+          left: 12px;
+          right: 12px;
+          bottom: 12px;
+          width: auto;
+          text-align: center;
         }
       }
 
@@ -2277,11 +2478,15 @@
           padding: 6px 9px;
           min-height: 32px;
         }
-        #app .app-body {
-          padding-top: 64px;
+        .stats-grid {
+          grid-template-columns: 1fr;
         }
-        #app .top-nav.mobile-open + .app-body {
-          padding-top: 246px;
+        .tab-bar {
+          grid-template-columns: 1fr;
+        }
+        .lead-action-btns,
+        .ticket-action-btns {
+          grid-template-columns: 1fr;
         }
 
         .login-card {
@@ -2295,11 +2500,8 @@
           font-size: 8px;
           letter-spacing: 0.18em;
         }
-        .app-content {
-          padding: 18px 12px;
-        }
-        .page-header {
-          margin-bottom: 18px;
+        .drop-zone {
+          padding: 22px 12px;
         }
       }
     </style>
@@ -4305,6 +4507,14 @@
 
       window.addEventListener("resize", () => {
         if (window.innerWidth > 700) closeMobileNav();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (window.innerWidth > 700) return;
+        const nav = document.querySelector("#app .top-nav");
+        if (!nav) return;
+        if (nav.contains(e.target)) return;
+        closeMobileNav();
       });
 
       function switchKbView(view) {
