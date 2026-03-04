@@ -571,6 +571,47 @@
     let chatHistory = [];
     let isOpen = false;
     let hasOpened = false;
+    let notificationWebhook = null;
+    let webhookLoaded = false;
+
+    async function loadNotificationWebhook() {
+      if (webhookLoaded) return notificationWebhook;
+      webhookLoaded = true;
+      try {
+        const res = await fetch(`${workerUrl}/client-settings-get`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+          body: JSON.stringify({ client_id: apiClientId }),
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        notificationWebhook = (data.notification_webhook || '').trim() || null;
+      } catch {
+        notificationWebhook = null;
+      }
+      return notificationWebhook;
+    }
+
+    async function submitFormspreeFallback(leadPayload) {
+      const webhook = await loadNotificationWebhook();
+      if (!webhook || !/formspree\.io\//i.test(webhook)) return false;
+      const res = await fetch(webhook, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: leadPayload.name,
+          email: leadPayload.email,
+          phone: leadPayload.phone || '—',
+          message: leadPayload.message || '—',
+          source: leadPayload.source || 'chatbot',
+          _subject: `New Chatbot Lead · ${leadPayload.name || 'Unknown'}`,
+        }),
+      });
+      return res.ok;
+    }
 
     // ── Rendering helpers ──
 
@@ -762,6 +803,8 @@
           });
         } catch (e) { /* best effort */ }
       };
+
+          submitFormspreeFallback(leadPayload).catch(() => {});
     }
 
     // ── Core send ──
