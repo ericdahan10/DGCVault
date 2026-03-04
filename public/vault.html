@@ -1858,6 +1858,7 @@
         position: relative;
         border-left-width: 4px;
         transition: border-color 0.15s;
+        cursor: pointer;
       }
       .ticket-card.urgency-high {
         border-left-color: #ef4444;
@@ -2862,11 +2863,11 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
-                  flex-wrap: wrap;
-                  gap: 12px;
+                flex-wrap: wrap;
+                gap: 12px;
               "
             >
-                <div style="flex: 1 1 420px; min-width: 0">
+              <div style="flex: 1 1 420px; min-width: 0">
                 <div class="page-eyebrow">VAULT · RAG Intelligence</div>
                 <h1 class="page-title">Knowledge Base</h1>
                 <p class="page-desc">
@@ -5153,6 +5154,7 @@
         if (convoListEl) {
           if (convosResult.status === "fulfilled") {
             const convos = convosResult.value.conversations || [];
+            recentConversationsCache = convos;
             if (convos.length === 0) {
               convoListEl.innerHTML =
                 '<div style="color:#556;font-size:12px;font-family:Inter,sans-serif;padding:8px 0">No conversations yet.</div>';
@@ -5206,6 +5208,7 @@
           } else {
             convoListEl.innerHTML =
               '<div style="color:#556;font-size:12px;font-family:Inter,sans-serif;padding:8px 0">Could not load conversations.</div>';
+            recentConversationsCache = [];
           }
         }
       }
@@ -5269,6 +5272,7 @@
       // ── Leads ────────────────────────────────────────────────────────────────────
       let allLeads = [];
       let activeLeadFilter = "all";
+      let recentConversationsCache = [];
 
       async function loadLeads() {
         document.getElementById("leads-container").innerHTML =
@@ -5509,6 +5513,103 @@
         renderTickets();
       }
 
+      function formatTicketSubmittedAt(value) {
+        if (!value) return "Submitted: —";
+        const dateObj = new Date(value);
+        if (Number.isNaN(dateObj.getTime())) return "Submitted: —";
+        return `Submitted: ${dateObj.toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })}`;
+      }
+
+      function normalizeText(value) {
+        return String(value || "").trim().toLowerCase();
+      }
+
+      function normalizePhone(value) {
+        return String(value || "")
+          .replace(/\D/g, "")
+          .slice(-10);
+      }
+
+      async function resolveTicketConversation(ticket) {
+        const directId =
+          ticket?.conversation_id ||
+          ticket?.conversationId ||
+          ticket?.chat_conversation_id ||
+          ticket?.conversation?.id;
+        if (directId) {
+          return {
+            id: directId,
+            label:
+              ticket?.visitor_name ||
+              ticket?.visitor_email ||
+              `Ticket ${ticket?.ticket_number || ""}`,
+            messageCount: ticket?.message_count || 0,
+          };
+        }
+
+        let convos = recentConversationsCache;
+        if (!convos.length) {
+          try {
+            const data = await callApi("/analytics-conversations", {});
+            convos = data.conversations || [];
+            recentConversationsCache = convos;
+          } catch {
+            convos = [];
+          }
+        }
+        if (!convos.length) return null;
+
+        const ticketEmail = normalizeText(ticket?.visitor_email);
+        const ticketPhone = normalizePhone(ticket?.visitor_phone);
+        const ticketName = normalizeText(ticket?.visitor_name);
+
+        const byEmail = convos.find(
+          (c) => ticketEmail && normalizeText(c.visitor_email) === ticketEmail,
+        );
+        const byPhone = convos.find(
+          (c) => ticketPhone && normalizePhone(c.visitor_phone) === ticketPhone,
+        );
+        const byName = convos.find(
+          (c) => ticketName && normalizeText(c.visitor_name) === ticketName,
+        );
+
+        const match = byEmail || byPhone || byName;
+        if (!match) return null;
+
+        return {
+          id: match.id,
+          label:
+            match.visitor_name ||
+            match.visitor_email ||
+            ticket?.visitor_name ||
+            `Ticket ${ticket?.ticket_number || ""}`,
+          messageCount: match.message_count || 0,
+        };
+      }
+
+      async function openTicketConversation(ticketIndex) {
+        const filtered =
+          activeTicketFilter === "all"
+            ? allTickets
+            : allTickets.filter((t) => t.status === activeTicketFilter);
+        const ticket = filtered[ticketIndex];
+        if (!ticket) return;
+
+        const convo = await resolveTicketConversation(ticket);
+        if (!convo?.id) {
+          showToast("No linked conversation found for this ticket", "error");
+          return;
+        }
+
+        openConvoDrawer(convo.id, convo.label, convo.messageCount || 0);
+      }
+
       function renderTickets() {
         const filtered =
           activeTicketFilter === "all"
@@ -5534,9 +5635,7 @@
           .map((t, i) => {
             const urgency = (t.urgency || "medium").toLowerCase();
             const status = t.status || "open";
-            const dateStr = t.created_at
-              ? new Date(t.created_at).toLocaleString()
-              : "—";
+            const submittedAt = formatTicketSubmittedAt(t.created_at);
             const ticketNum = t.ticket_number || "N/A";
             const desc =
               t.description || t.subject || "No description provided.";
@@ -5546,7 +5645,7 @@
               : null;
 
             return `
-        <div class="ticket-card urgency-${urgency}" id="ticket-card-${i}">
+        <div class="ticket-card urgency-${urgency}" id="ticket-card-${i}" onclick="openTicketConversation(${i})">
           <div class="ticket-main">
             <div class="ticket-top">
               <span class="ticket-id">${escapeHtml(ticketNum)}</span>
@@ -5556,13 +5655,13 @@
             <div class="ticket-issue">${escapeHtml(desc)}</div>
             <div class="ticket-visitor">
               ${t.visitor_name ? `<span class="ticket-visitor-name"><strong>${escapeHtml(t.visitor_name)}</strong></span>` : ""}
-              ${t.visitor_email ? `<span class="ticket-visitor-email"><a href="mailto:${encodeURIComponent(t.visitor_email)}">${escapeHtml(t.visitor_email)}</a></span>` : ""}
+              ${t.visitor_email ? `<span class="ticket-visitor-email"><a href="mailto:${encodeURIComponent(t.visitor_email)}" onclick="event.stopPropagation()">${escapeHtml(t.visitor_email)}</a></span>` : ""}
               ${t.visitor_phone ? `<span class="ticket-visitor-name">${escapeHtml(t.visitor_phone)}</span>` : ""}
             </div>
-            <div class="ticket-date">${dateStr}</div>
+            <div class="ticket-date">${submittedAt}</div>
           </div>
           <div class="ticket-actions">
-            <select class="ticket-status-select" onchange="updateTicketStatus('${escapeHtml(ticketNum)}', this.value, ${i})">
+            <select class="ticket-status-select" onclick="event.stopPropagation()" onchange="updateTicketStatus('${escapeHtml(ticketNum)}', this.value, ${i})">
               <option value="open"        ${status === "open" ? "selected" : ""}>Open</option>
               <option value="in_progress" ${status === "in_progress" ? "selected" : ""}>In Progress</option>
               <option value="resolved"    ${status === "resolved" ? "selected" : ""}>Resolved</option>
@@ -5570,11 +5669,11 @@
             <div class="ticket-action-btns">
               ${
                 emailHref
-                  ? `<a href="${emailHref}" class="ticket-btn ticket-btn-email">✉ Email</a>`
-                  : `<button class="ticket-btn ticket-btn-email" disabled style="opacity:0.4;cursor:default">✉ Email</button>`
+                  ? `<a href="${emailHref}" class="ticket-btn ticket-btn-email" onclick="event.stopPropagation()">✉ Email</a>`
+                  : `<button class="ticket-btn ticket-btn-email" disabled onclick="event.stopPropagation()" style="opacity:0.4;cursor:default">✉ Email</button>`
               }
               <button class="ticket-btn ticket-btn-crm ${crmPushed ? "pushed" : ""}"
-                onclick="${crmPushed ? "" : `pushTicketToCrm(${i})`}"
+                onclick="event.stopPropagation(); ${crmPushed ? "" : `pushTicketToCrm(${i})`}"
                 ${crmPushed ? "disabled" : ""}>
                 ${crmPushed ? "✓ CRM" : "⬆ CRM"}
               </button>
