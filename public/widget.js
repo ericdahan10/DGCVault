@@ -595,20 +595,21 @@
     async function submitFormspreeFallback(leadPayload) {
       const webhook = await loadNotificationWebhook();
       if (!webhook || !/formspree\.io\//i.test(webhook)) return false;
+      const params = new URLSearchParams();
+      params.set('name', leadPayload.name || 'Unknown');
+      params.set('email', leadPayload.email || '');
+      params.set('phone', leadPayload.phone || '—');
+      params.set('message', leadPayload.message || '—');
+      params.set('source', leadPayload.source || 'chatbot');
+      params.set('_subject', `New Chatbot Lead · ${leadPayload.name || 'Unknown'}`);
+      if (leadPayload.email) params.set('_replyto', leadPayload.email);
       const res = await fetch(webhook, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          name: leadPayload.name,
-          email: leadPayload.email,
-          phone: leadPayload.phone || '—',
-          message: leadPayload.message || '—',
-          source: leadPayload.source || 'chatbot',
-          _subject: `New Chatbot Lead · ${leadPayload.name || 'Unknown'}`,
-        }),
+        body: params.toString(),
       });
       return res.ok;
     }
@@ -749,6 +750,8 @@
             throw new Error(err);
           }
 
+          await submitFormspreeFallback(leadPayload).catch(() => false);
+
           formAreaEl.style.display = 'none';
           formAreaEl.innerHTML = '';
           addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, 'bot');
@@ -804,8 +807,7 @@
         } catch (e) { /* best effort */ }
       };
 
-          submitFormspreeFallback(leadPayload).catch(() => {});
-    }
+            }
 
     // ── Core send ──
 
