@@ -348,7 +348,7 @@
         font-size: 13px;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        white-space: normal !important;
+        white-space: nowrap !important;
         width: fit-content;
         min-width: 220px;
         max-width: 100%;
