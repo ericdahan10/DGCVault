@@ -401,6 +401,13 @@
         from { opacity: 0; transform: translateY(8px); }
         to { opacity: 1; transform: translateY(0); }
       }
+      .echo-inline-form-heading {
+        margin: 0 0 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: ${isDark ? "#dce9f8" : "#1f2f45"};
+        letter-spacing: 0.01em;
+      }
       .echo-inline-form label {
         display: block;
         font-size: 10.5px;
@@ -750,6 +757,7 @@
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
+          <p class="echo-inline-form-heading">Get in touch</p>
           <label>Name</label>
           <input id="echo-cf-name" type="text" placeholder="Your name" />
           <label>Email</label>
@@ -810,6 +818,7 @@
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-inline-form">
+          <p class="echo-inline-form-heading">submit a ticket</p>
           <label>Name</label>
           <input id="echo-ef-name" type="text" placeholder="Your name" />
           <label>Email</label>
