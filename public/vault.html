@@ -5568,6 +5568,16 @@
         const ticketEmail = normalizeText(ticket?.visitor_email);
         const ticketPhone = normalizePhone(ticket?.visitor_phone);
         const ticketName = normalizeText(ticket?.visitor_name);
+        const ticketVisitorId = normalizeText(
+          ticket?.visitor_id || ticket?.visitorId,
+        );
+        const ticketCreatedAt = new Date(ticket?.created_at || "").getTime();
+
+        const byVisitorId = convos.find(
+          (c) =>
+            ticketVisitorId &&
+            normalizeText(c.visitor_id || c.visitorId) === ticketVisitorId,
+        );
 
         const byEmail = convos.find(
           (c) => ticketEmail && normalizeText(c.visitor_email) === ticketEmail,
@@ -5579,7 +5589,32 @@
           (c) => ticketName && normalizeText(c.visitor_name) === ticketName,
         );
 
-        const match = byEmail || byPhone || byName;
+        let byTime = null;
+        if (!Number.isNaN(ticketCreatedAt) && ticketCreatedAt > 0) {
+          const dated = convos
+            .map((c) => {
+              const convoTime = new Date(c.started_at || "").getTime();
+              return { c, convoTime };
+            })
+            .filter(({ convoTime }) => !Number.isNaN(convoTime));
+          if (dated.length) {
+            dated.sort(
+              (a, b) =>
+                Math.abs(a.convoTime - ticketCreatedAt) -
+                Math.abs(b.convoTime - ticketCreatedAt),
+            );
+            const nearest = dated[0];
+            if (
+              nearest &&
+              Math.abs(nearest.convoTime - ticketCreatedAt) <=
+                24 * 60 * 60 * 1000
+            ) {
+              byTime = nearest.c;
+            }
+          }
+        }
+
+        const match = byVisitorId || byEmail || byPhone || byName || byTime;
         if (!match) return null;
 
         return {
