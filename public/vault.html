@@ -5170,7 +5170,6 @@
                 .join("");
             }
           } else {
-            console.error("[analytics-conversations] failed:", convosResult.reason?.message);
             convoListEl.innerHTML =
               '<div style="color:#556;font-size:12px;font-family:Inter,sans-serif;padding:8px 0">Could not load conversations.</div>';
             recentConversationsCache = [];
@@ -5511,13 +5510,6 @@
           ticket?.visitor_email ||
           `Ticket ${ticket?.ticket_number || ""}`;
 
-        console.log("[ticket-link] ticket fields:", {
-          conversation_id: ticket?.conversation_id,
-          visitor_id: ticket?.visitor_id,
-          visitor_email: ticket?.visitor_email,
-          ticket_number: ticket?.ticket_number,
-        });
-
         // 1. Direct conversation_id on the ticket — always trust this first
         const directId =
           ticket?.conversation_id ||
@@ -5525,34 +5517,30 @@
           ticket?.chat_conversation_id ||
           ticket?.conversation?.id;
         if (directId) {
-          console.log("[ticket-link] found via direct id:", directId);
           return { id: directId, label, messageCount: ticket?.message_count || 0 };
         }
 
         // 2. visitor_id → targeted fetch (exact match, no scanning a limited cache)
         const visitorId = ticket?.visitor_id || ticket?.visitorId;
-        console.log("[ticket-link] no direct id, trying visitor_id:", visitorId);
         if (visitorId) {
           try {
             const data = await callApi("/analytics-conversations", { visitor_id: visitorId });
             const convos = data.conversations || [];
-            console.log("[ticket-link] visitor_id fetch returned", convos.length, "convos");
             if (convos.length) {
-              const match = convos[0]; // newest conversation for this visitor
+              const match = convos[0];
               return {
                 id: match.id,
                 label: match.visitor_name || match.visitor_email || label,
                 messageCount: match.message_count || 0,
               };
             }
-          } catch (e) {
-            console.log("[ticket-link] visitor_id fetch error:", e.message);
+          } catch {
+            // fall through to email fallback
           }
         }
 
         // 3. Email match against recent conversations cache (last resort)
         const ticketEmail = normalizeText(ticket?.visitor_email);
-        console.log("[ticket-link] trying email fallback, email:", ticketEmail);
         if (ticketEmail) {
           let convos = recentConversationsCache;
           if (!convos.length) {
@@ -5560,12 +5548,10 @@
               const data = await callApi("/analytics-conversations", {});
               convos = data.conversations || [];
               recentConversationsCache = convos;
-            } catch (e) {
-              console.log("[ticket-link] email fallback fetch error:", e.message);
+            } catch {
               convos = [];
             }
           }
-          console.log("[ticket-link] convos available:", convos.length, "| emails:", convos.map(c => c.visitor_email));
           const match = convos.find(
             (c) => normalizeText(c.visitor_email) === ticketEmail,
           );
