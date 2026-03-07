@@ -5480,91 +5480,66 @@
       }
 
       async function resolveTicketConversation(ticket) {
+        const label =
+          ticket?.visitor_name ||
+          ticket?.visitor_email ||
+          `Ticket ${ticket?.ticket_number || ""}`;
+
+        // 1. Direct conversation_id on the ticket — always trust this first
         const directId =
           ticket?.conversation_id ||
           ticket?.conversationId ||
           ticket?.chat_conversation_id ||
           ticket?.conversation?.id;
         if (directId) {
-          return {
-            id: directId,
-            label:
-              ticket?.visitor_name ||
-              ticket?.visitor_email ||
-              `Ticket ${ticket?.ticket_number || ""}`,
-            messageCount: ticket?.message_count || 0,
-          };
+          return { id: directId, label, messageCount: ticket?.message_count || 0 };
         }
 
-        let convos = recentConversationsCache;
-        if (!convos.length) {
+        // 2. visitor_id → targeted fetch (exact match, no scanning a limited cache)
+        const visitorId = ticket?.visitor_id || ticket?.visitorId;
+        if (visitorId) {
           try {
-            const data = await callApi("/analytics-conversations", {});
-            convos = data.conversations || [];
-            recentConversationsCache = convos;
+            const data = await callApi("/analytics-conversations", { visitor_id: visitorId });
+            const convos = data.conversations || [];
+            if (convos.length) {
+              const match = convos[0]; // newest conversation for this visitor
+              return {
+                id: match.id,
+                label: match.visitor_name || match.visitor_email || label,
+                messageCount: match.message_count || 0,
+              };
+            }
           } catch {
-            convos = [];
+            // fall through to email fallback
           }
         }
-        if (!convos.length) return null;
 
+        // 3. Email match against recent conversations cache (last resort)
         const ticketEmail = normalizeText(ticket?.visitor_email);
-        const ticketPhone = normalizePhone(ticket?.visitor_phone);
-        const ticketVisitorId = normalizeText(
-          ticket?.visitor_id || ticket?.visitorId,
-        );
-        const ticketCreatedAt = new Date(ticket?.created_at || "").getTime();
-
-        const byVisitorId = convos.find(
-          (c) =>
-            ticketVisitorId &&
-            normalizeText(c.visitor_id || c.visitorId) === ticketVisitorId,
-        );
-
-        const byEmail = convos.find(
-          (c) => ticketEmail && normalizeText(c.visitor_email) === ticketEmail,
-        );
-        const byPhone = convos.find(
-          (c) => ticketPhone && normalizePhone(c.visitor_phone) === ticketPhone,
-        );
-
-        let byTime = null;
-        if (!Number.isNaN(ticketCreatedAt) && ticketCreatedAt > 0) {
-          const dated = convos
-            .map((c) => {
-              const convoTime = new Date(c.started_at || "").getTime();
-              return { c, convoTime };
-            })
-            .filter(({ convoTime }) => !Number.isNaN(convoTime));
-          if (dated.length) {
-            dated.sort(
-              (a, b) =>
-                Math.abs(a.convoTime - ticketCreatedAt) -
-                Math.abs(b.convoTime - ticketCreatedAt),
-            );
-            const nearest = dated[0];
-            if (
-              nearest &&
-              Math.abs(nearest.convoTime - ticketCreatedAt) <=
-                2 * 60 * 60 * 1000
-            ) {
-              byTime = nearest.c;
+        if (ticketEmail) {
+          let convos = recentConversationsCache;
+          if (!convos.length) {
+            try {
+              const data = await callApi("/analytics-conversations", {});
+              convos = data.conversations || [];
+              recentConversationsCache = convos;
+            } catch {
+              convos = [];
             }
           }
+          const match = convos.find(
+            (c) => normalizeText(c.visitor_email) === ticketEmail,
+          );
+          if (match) {
+            return {
+              id: match.id,
+              label: match.visitor_name || match.visitor_email || label,
+              messageCount: match.message_count || 0,
+            };
+          }
         }
 
-        const match = byVisitorId || byEmail || byPhone || byTime;
-        if (!match) return null;
-
-        return {
-          id: match.id,
-          label:
-            match.visitor_name ||
-            match.visitor_email ||
-            ticket?.visitor_name ||
-            `Ticket ${ticket?.ticket_number || ""}`,
-          messageCount: match.message_count || 0,
-        };
+        return null;
       }
 
       async function openTicketConversation(ticketIndex) {

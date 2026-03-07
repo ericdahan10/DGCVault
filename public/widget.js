@@ -656,6 +656,7 @@
     let chatHistory = [];
     let isOpen = false;
     let activeConversationId = null;
+    let ticketSubmitted = false;
     let hasOpened = false;
     let activeFormMsgEl = null;
 
@@ -835,6 +836,10 @@
 
     function showEscalationForm() {
       clearQuickReplies();
+      if (ticketSubmitted) {
+        addMsg("You already have an open support ticket with us. We'll be in touch soon!", "bot");
+        return;
+      }
       const formMsg = mountFormAsMessage(`
         <div class="echo-form-shell">
           <p class="echo-form-title">Submit a Ticket</p>
@@ -868,6 +873,7 @@
           return;
         }
 
+        ticketSubmitted = true;
         clearActiveFormMessage();
         addMsg(
           `Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`,
