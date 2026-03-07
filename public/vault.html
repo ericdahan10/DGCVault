@@ -5170,6 +5170,7 @@
                 .join("");
             }
           } else {
+            console.error("[analytics-conversations] failed:", convosResult.reason?.message);
             convoListEl.innerHTML =
               '<div style="color:#556;font-size:12px;font-family:Inter,sans-serif;padding:8px 0">Could not load conversations.</div>';
             recentConversationsCache = [];
