@@ -1810,6 +1810,41 @@
         color: #fff;
       }
 
+      .ticket-urgency-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .ticket-urgency-btn {
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #2a3d5c;
+        background: transparent;
+        color: #888;
+        font-size: 11px;
+        font-family: "Inter", sans-serif;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .ticket-urgency-btn:hover { border-color: #555; color: #ccc; }
+      .ticket-urgency-btn .dot {
+        width: 7px; height: 7px; border-radius: 50%; opacity: 0.5;
+      }
+      .ticket-urgency-btn.active .dot { opacity: 1; }
+      .ticket-urgency-btn.active { color: #fff; }
+      .ticket-urgency-btn[data-urgency="high"]          { }
+      .ticket-urgency-btn[data-urgency="high"].active   { background: #ef444422; border-color: #ef4444; color: #ef4444; }
+      .ticket-urgency-btn[data-urgency="high"] .dot     { background: #ef4444; }
+      .ticket-urgency-btn[data-urgency="medium"].active { background: #f59e0b22; border-color: #f59e0b; color: #f59e0b; }
+      .ticket-urgency-btn[data-urgency="medium"] .dot   { background: #f59e0b; }
+      .ticket-urgency-btn[data-urgency="low"].active    { background: #4ade8022; border-color: #4ade80; color: #4ade80; }
+      .ticket-urgency-btn[data-urgency="low"] .dot      { background: #4ade80; }
+      .ticket-urgency-btn[data-urgency="all"].active    { background: #4a8ac7; border-color: #4a8ac7; color: #fff; }
+
       .ticket-card {
         background: linear-gradient(150deg, #1e2636, #1c1c1c);
         border: 1px solid #2a3d5c;
@@ -3766,36 +3801,20 @@
               </button>
             </div>
 
-            <!-- Filter bar -->
+            <!-- Status filter bar -->
             <div class="ticket-filter-bar">
-              <button
-                class="ticket-filter-btn active"
-                id="tf-all"
-                onclick="filterTickets('all')"
-              >
-                All
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="tf-open"
-                onclick="filterTickets('open')"
-              >
-                Open
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="tf-in_progress"
-                onclick="filterTickets('in_progress')"
-              >
-                In Progress
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="tf-resolved"
-                onclick="filterTickets('resolved')"
-              >
-                Resolved
-              </button>
+              <button class="ticket-filter-btn active" id="tf-all" onclick="filterTickets('all')">All</button>
+              <button class="ticket-filter-btn" id="tf-open" onclick="filterTickets('open')">Open</button>
+              <button class="ticket-filter-btn" id="tf-in_progress" onclick="filterTickets('in_progress')">In Progress</button>
+              <button class="ticket-filter-btn" id="tf-resolved" onclick="filterTickets('resolved')">Resolved</button>
+            </div>
+
+            <!-- Urgency filter bar -->
+            <div class="ticket-urgency-bar">
+              <button class="ticket-urgency-btn active" id="tu-all" data-urgency="all" onclick="filterUrgency('all')">All urgency</button>
+              <button class="ticket-urgency-btn" id="tu-high" data-urgency="high" onclick="filterUrgency('high')"><span class="dot"></span>High</button>
+              <button class="ticket-urgency-btn" id="tu-medium" data-urgency="medium" onclick="filterUrgency('medium')"><span class="dot"></span>Medium</button>
+              <button class="ticket-urgency-btn" id="tu-low" data-urgency="low" onclick="filterUrgency('low')"><span class="dot"></span>Low</button>
             </div>
 
             <!-- Ticket list -->
@@ -5431,6 +5450,7 @@
       // ── Tickets ──────────────────────────────────────────────────────────────────
       let allTickets = []; // full list from server
       let activeTicketFilter = "all";
+      let activeUrgencyFilter = "all";
 
       async function loadTickets() {
         document.getElementById("tickets-container").innerHTML =
@@ -5447,10 +5467,15 @@
 
       function filterTickets(status) {
         activeTicketFilter = status;
-        document
-          .querySelectorAll(".ticket-filter-btn")
-          .forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".ticket-filter-btn").forEach((b) => b.classList.remove("active"));
         document.getElementById(`tf-${status}`).classList.add("active");
+        renderTickets();
+      }
+
+      function filterUrgency(urgency) {
+        activeUrgencyFilter = urgency;
+        document.querySelectorAll(".ticket-urgency-btn").forEach((b) => b.classList.remove("active"));
+        document.getElementById(`tu-${urgency}`).classList.add("active");
         renderTickets();
       }
 
@@ -5553,11 +5578,7 @@
       }
 
       async function openTicketConversation(ticketIndex) {
-        const filtered =
-          activeTicketFilter === "all"
-            ? allTickets
-            : allTickets.filter((t) => t.status === activeTicketFilter);
-        const ticket = filtered[ticketIndex];
+        const ticket = getFilteredTickets()[ticketIndex];
         if (!ticket) return;
 
         const convo = await resolveTicketConversation(ticket);
@@ -5569,11 +5590,14 @@
         openConvoDrawer(convo.id, convo.label, convo.messageCount || 0);
       }
 
+      function getFilteredTickets() {
+        return allTickets
+          .filter((t) => activeTicketFilter === "all" || t.status === activeTicketFilter)
+          .filter((t) => activeUrgencyFilter === "all" || (t.urgency || "medium").toLowerCase() === activeUrgencyFilter);
+      }
+
       function renderTickets() {
-        const filtered =
-          activeTicketFilter === "all"
-            ? allTickets
-            : allTickets.filter((t) => t.status === activeTicketFilter);
+        const filtered = getFilteredTickets();
 
         const container = document.getElementById("tickets-container");
         if (filtered.length === 0) {
