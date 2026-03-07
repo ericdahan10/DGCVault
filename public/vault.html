@@ -5485,6 +5485,13 @@
           ticket?.visitor_email ||
           `Ticket ${ticket?.ticket_number || ""}`;
 
+        console.log("[ticket-link] ticket fields:", {
+          conversation_id: ticket?.conversation_id,
+          visitor_id: ticket?.visitor_id,
+          visitor_email: ticket?.visitor_email,
+          ticket_number: ticket?.ticket_number,
+        });
+
         // 1. Direct conversation_id on the ticket — always trust this first
         const directId =
           ticket?.conversation_id ||
@@ -5492,15 +5499,18 @@
           ticket?.chat_conversation_id ||
           ticket?.conversation?.id;
         if (directId) {
+          console.log("[ticket-link] found via direct id:", directId);
           return { id: directId, label, messageCount: ticket?.message_count || 0 };
         }
 
         // 2. visitor_id → targeted fetch (exact match, no scanning a limited cache)
         const visitorId = ticket?.visitor_id || ticket?.visitorId;
+        console.log("[ticket-link] no direct id, trying visitor_id:", visitorId);
         if (visitorId) {
           try {
             const data = await callApi("/analytics-conversations", { visitor_id: visitorId });
             const convos = data.conversations || [];
+            console.log("[ticket-link] visitor_id fetch returned", convos.length, "convos");
             if (convos.length) {
               const match = convos[0]; // newest conversation for this visitor
               return {
@@ -5509,8 +5519,8 @@
                 messageCount: match.message_count || 0,
               };
             }
-          } catch {
-            // fall through to email fallback
+          } catch (e) {
+            console.log("[ticket-link] visitor_id fetch error:", e.message);
           }
         }
 
