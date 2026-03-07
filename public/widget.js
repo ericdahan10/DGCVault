@@ -655,6 +655,7 @@
 
     let chatHistory = [];
     let isOpen = false;
+    let activeConversationId = null;
     let hasOpened = false;
     let activeFormMsgEl = null;
 
@@ -886,6 +887,7 @@
               phone,
               client_id: apiClientId,
               visitor_id: visitorId,
+              conversation_id: activeConversationId,
             }),
           });
         } catch (e) {
@@ -927,6 +929,7 @@
 
         const data = await res.json();
         const routing = data._routing || {};
+        if (data.conversation_id) activeConversationId = data.conversation_id;
         const reply =
           data?.content?.[0]?.text ||
           "I'm having trouble responding right now. Please try again.";

@@ -5510,7 +5510,6 @@
 
         const ticketEmail = normalizeText(ticket?.visitor_email);
         const ticketPhone = normalizePhone(ticket?.visitor_phone);
-        const ticketName = normalizeText(ticket?.visitor_name);
         const ticketVisitorId = normalizeText(
           ticket?.visitor_id || ticket?.visitorId,
         );
@@ -5527,9 +5526,6 @@
         );
         const byPhone = convos.find(
           (c) => ticketPhone && normalizePhone(c.visitor_phone) === ticketPhone,
-        );
-        const byName = convos.find(
-          (c) => ticketName && normalizeText(c.visitor_name) === ticketName,
         );
 
         let byTime = null;
@@ -5550,14 +5546,14 @@
             if (
               nearest &&
               Math.abs(nearest.convoTime - ticketCreatedAt) <=
-                24 * 60 * 60 * 1000
+                2 * 60 * 60 * 1000
             ) {
               byTime = nearest.c;
             }
           }
         }
 
-        const match = byVisitorId || byEmail || byPhone || byName || byTime;
+        const match = byVisitorId || byEmail || byPhone || byTime;
         if (!match) return null;
 
         return {
