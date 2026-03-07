@@ -479,16 +479,6 @@
         margin-top: 4px;
       }
 
-      /* ── Vault subtitle (login) ─────────────────────────────────────────────── */
-      .vault-subtitle {
-        font-size: 12px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.35);
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        margin-bottom: 14px;
-      }
-
       /* ── Tab bar — visual card grid ─────────────────────────────────────────── */
       .tab-bar {
         display: grid;
@@ -794,32 +784,6 @@
       .stat-sub {
         font-size: 11px;
         color: #556;
-        font-family: "Inter", sans-serif;
-      }
-
-      /* ── Coming soon ────────────────────────────────────────────────────────── */
-      .coming-soon {
-        background: linear-gradient(150deg, #1e2533 0%, #181818 60%);
-        border: 1px dashed #2a3d5c;
-        border-radius: 12px;
-        padding: 36px 24px;
-        text-align: center;
-      }
-
-      .coming-soon-icon {
-        font-size: 28px;
-        margin-bottom: 10px;
-      }
-      .coming-soon-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #ccc;
-        margin-bottom: 6px;
-      }
-      .coming-soon-desc {
-        font-size: 12px;
-        color: #555;
-        line-height: 1.6;
         font-family: "Inter", sans-serif;
       }
 
@@ -1891,17 +1855,6 @@
         font-size: 11px;
         color: #4a8ac7;
         font-weight: 700;
-        letter-spacing: 0.5px;
-      }
-      .ticket-category {
-        font-size: 10px;
-        background: #1a2a40;
-        color: #7aaddb;
-        border: 1px solid #2a4a6a;
-        border-radius: 4px;
-        padding: 2px 7px;
-        text-transform: uppercase;
-        font-weight: 600;
         letter-spacing: 0.5px;
       }
       .ticket-urgency-badge {
@@ -4783,14 +4736,6 @@
         return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
       }
 
-      function escapeHtml(str) {
-        return String(str)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
-      }
-
       async function loadSources() {
         const container = document.getElementById("sources-grid-container");
         container.innerHTML =
@@ -5213,10 +5158,6 @@
         }
       }
 
-      // Legacy alias — keeps any other code that calls loadStats() working
-      function loadStats() {
-        loadAnalytics();
-      }
 
       // ── Conversation Drawer ──────────────────────────────────────────────────────
       async function openConvoDrawer(id, visitorLabel, msgCount) {
@@ -5527,7 +5468,9 @@
       }
 
       function normalizeText(value) {
-        return String(value || "").trim().toLowerCase();
+        return String(value || "")
+          .trim()
+          .toLowerCase();
       }
 
       function normalizePhone(value) {
@@ -5953,8 +5896,8 @@
           loadSettings();
           loadWidgetSettings();
         }
-        if (activePage === "leads") reloadLeads?.();
-        if (activePage === "tickets") reloadTickets?.();
+        if (activePage === "leads") loadLeads();
+        if (activePage === "tickets") loadTickets();
         if (activePage === "analytics") loadAnalytics?.();
       }
 
