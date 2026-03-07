@@ -834,7 +834,7 @@
       };
     }
 
-    function showEscalationForm() {
+    function showEscalationForm(ticketData = {}) {
       clearQuickReplies();
       if (ticketSubmitted) {
         addMsg("You already have an open support ticket with us. We'll be in touch soon!", "bot");
@@ -894,6 +894,9 @@
               client_id: apiClientId,
               visitor_id: visitorId,
               conversation_id: activeConversationId,
+              urgency: ticketData.urgency || "medium",
+              issue_summary: ticketData.issue_summary || "",
+              category: ticketData.category || "escalation",
             }),
           });
         } catch (e) {
@@ -944,7 +947,7 @@
         addMsg(reply, "bot");
 
         if (routing.action === "escalation") {
-          showEscalationForm();
+          showEscalationForm(routing.ticketData || {});
         } else if (routing.action === "contact") {
           showContactForm();
         } else {
