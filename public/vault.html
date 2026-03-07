@@ -5552,6 +5552,7 @@
 
         // 3. Email match against recent conversations cache (last resort)
         const ticketEmail = normalizeText(ticket?.visitor_email);
+        console.log("[ticket-link] trying email fallback, email:", ticketEmail);
         if (ticketEmail) {
           let convos = recentConversationsCache;
           if (!convos.length) {
@@ -5559,10 +5560,12 @@
               const data = await callApi("/analytics-conversations", {});
               convos = data.conversations || [];
               recentConversationsCache = convos;
-            } catch {
+            } catch (e) {
+              console.log("[ticket-link] email fallback fetch error:", e.message);
               convos = [];
             }
           }
+          console.log("[ticket-link] convos available:", convos.length, "| emails:", convos.map(c => c.visitor_email));
           const match = convos.find(
             (c) => normalizeText(c.visitor_email) === ticketEmail,
           );
