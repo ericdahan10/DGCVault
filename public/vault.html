@@ -9,7 +9,7 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='10' fill='%230f0009'/><ellipse cx='22' cy='22' rx='19' ry='18' fill='none' stroke='%239d174d' stroke-width='1.5'/><ellipse cx='22' cy='22' rx='13' ry='9' fill='none' stroke='%23ec4899' stroke-width='1.5'/><circle cx='22' cy='22' r='3.5' fill='%23ec4899'/><circle cx='33' cy='14' r='2' fill='%23f9a8d4' opacity='0.8'/></svg>"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='10' fill='%230e1420'/><ellipse cx='22' cy='22' rx='19' ry='18' fill='none' stroke='%232d5a8f' stroke-width='1.5'/><ellipse cx='22' cy='22' rx='13' ry='9' fill='none' stroke='%234a8ac7' stroke-width='1.5'/><circle cx='22' cy='22' r='3.5' fill='%234a8ac7'/><circle cx='33' cy='14' r='2' fill='%237db8e8' opacity='0.8'/></svg>"
     />
 
     <!-- Open Graph — link previews for Slack, iMessage, LinkedIn, etc. -->
@@ -85,8 +85,8 @@
         position: fixed;
         inset: 0;
         background-image:
-          linear-gradient(rgba(157, 23, 77, 0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(157, 23, 77, 0.04) 1px, transparent 1px);
+          linear-gradient(rgba(45, 90, 143, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(45, 90, 143, 0.04) 1px, transparent 1px);
         background-size: 48px 48px;
         pointer-events: none;
         z-index: 0;
@@ -100,7 +100,7 @@
         right: 0;
         height: 64px;
         background: #1a1a1a;
-        border-bottom: 2px solid #9d174d;
+        border-bottom: 2px solid #2d5a8f;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -135,9 +135,9 @@
       }
 
       .nav-link.active {
-        color: #ec4899;
-        background: rgba(236, 72, 153, 0.1);
-        border-color: rgba(236, 72, 153, 0.25);
+        color: #4a8ac7;
+        background: rgba(74, 138, 199, 0.1);
+        border-color: rgba(74, 138, 199, 0.25);
       }
 
       .nav-logout {
@@ -182,13 +182,13 @@
       .login-card {
         width: 100%;
         max-width: 420px;
-        background: linear-gradient(150deg, #1a0a14 0%, #181818 60%);
-        border: 1px solid #4a0932;
+        background: linear-gradient(150deg, #1e2533 0%, #181818 60%);
+        border: 1px solid #2a3d5c;
         border-radius: 16px;
         padding: 48px 40px 40px;
         box-shadow:
           0 24px 64px rgba(0, 0, 0, 0.5),
-          inset 0 1px 0 rgba(236, 72, 153, 0.1);
+          inset 0 1px 0 rgba(74, 138, 199, 0.1);
         position: relative;
         z-index: 1;
       }
@@ -215,7 +215,7 @@
         border-radius: 50%;
         background: radial-gradient(
           circle,
-          rgba(236, 72, 153, 0.2) 0%,
+          rgba(74, 138, 199, 0.2) 0%,
           transparent 70%
         );
         pointer-events: none;
@@ -231,18 +231,18 @@
           135deg,
           #ffffff 0%,
           #a8d4f5 40%,
-          #ec4899 100%
+          #4a8ac7 100%
         );
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 28px rgba(236, 72, 153, 0.4));
+        filter: drop-shadow(0 0 28px rgba(74, 138, 199, 0.4));
         padding-right: 0.2em;
       }
 
       .vault-tag {
         font-size: 9px;
-        color: #ec4899;
+        color: #4a8ac7;
         letter-spacing: 0.22em;
         text-transform: uppercase;
         font-weight: 600;
@@ -261,7 +261,7 @@
         background: linear-gradient(
           to right,
           transparent,
-          rgba(236, 72, 153, 0.5)
+          rgba(74, 138, 199, 0.5)
         );
       }
 
@@ -269,7 +269,7 @@
         background: linear-gradient(
           to left,
           transparent,
-          rgba(236, 72, 153, 0.5)
+          rgba(74, 138, 199, 0.5)
         );
       }
 
@@ -300,8 +300,8 @@
       }
 
       .login-input:focus {
-        border-color: #9d174d;
-        box-shadow: 0 0 0 3px rgba(157, 23, 77, 0.2);
+        border-color: #2d5a8f;
+        box-shadow: 0 0 0 3px rgba(45, 90, 143, 0.2);
       }
       .login-input::placeholder {
         color: #444;
@@ -309,7 +309,7 @@
 
       .btn-login {
         width: 100%;
-        background: linear-gradient(135deg, #9d174d, #3a7bc8);
+        background: linear-gradient(135deg, #2d5a8f, #3a7bc8);
         border: none;
         border-radius: 8px;
         padding: 13px;
@@ -421,7 +421,7 @@
       /* ── Cards — matching TRACE card style ────────────────────────────────── */
       .card {
         background: linear-gradient(150deg, #262e3d 0%, #1e1e1e 60%);
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 12px;
         padding: 24px 28px;
         margin-bottom: 20px;
@@ -438,7 +438,7 @@
         align-items: center;
         gap: 10px;
         padding-left: 12px;
-        border-left: 2px solid #9d174d;
+        border-left: 2px solid #2d5a8f;
       }
 
       /* ── Page orb stamp — appears above every page section ─────────────────── */
@@ -448,7 +448,7 @@
         gap: 14px;
         margin-bottom: 32px;
         padding-bottom: 24px;
-        border-bottom: 1px solid rgba(157, 23, 77, 0.2);
+        border-bottom: 1px solid rgba(45, 90, 143, 0.2);
       }
 
       .page-orb-stamp-text {
@@ -463,7 +463,7 @@
           135deg,
           #ffffff 0%,
           #a8d4f5 40%,
-          #ec4899 100%
+          #4a8ac7 100%
         );
         background-clip: text;
         -webkit-background-clip: text;
@@ -513,10 +513,10 @@
       }
 
       .tab-btn.active {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         background: linear-gradient(160deg, #14243a 0%, #111820 100%);
         box-shadow:
-          0 0 0 1px rgba(236, 72, 153, 0.1),
+          0 0 0 1px rgba(74, 138, 199, 0.1),
           0 8px 32px rgba(0, 0, 0, 0.3);
         color: #dde8f4;
       }
@@ -530,7 +530,7 @@
         color: #4a6a88;
       }
       .tab-btn.active .tab-btn-icon {
-        color: #ec4899;
+        color: #4a8ac7;
       }
 
       .tab-btn-label {
@@ -595,8 +595,8 @@
 
       .form-input:focus,
       .form-textarea:focus {
-        border-color: #9d174d;
-        box-shadow: 0 0 0 3px rgba(157, 23, 77, 0.15);
+        border-color: #2d5a8f;
+        box-shadow: 0 0 0 3px rgba(45, 90, 143, 0.15);
       }
 
       .form-input::placeholder,
@@ -639,7 +639,7 @@
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #9d174d, #3a7bc8);
+        background: linear-gradient(135deg, #2d5a8f, #3a7bc8);
         color: #fff;
       }
 
@@ -653,18 +653,18 @@
 
       .btn-ghost {
         background: transparent;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         color: #888;
       }
 
       .btn-ghost:hover {
-        border-color: #ec4899;
-        color: #ec4899;
+        border-color: #4a8ac7;
+        color: #4a8ac7;
       }
 
       /* ── File drop zone ─────────────────────────────────────────────────────── */
       .drop-zone {
-        border: 2px dashed #4a0932;
+        border: 2px dashed #2a3d5c;
         border-radius: 10px;
         padding: 32px 24px;
         text-align: center;
@@ -678,8 +678,8 @@
 
       .drop-zone:hover,
       .drop-zone.dragover {
-        border-color: #ec4899;
-        background: rgba(236, 72, 153, 0.06);
+        border-color: #4a8ac7;
+        background: rgba(74, 138, 199, 0.06);
       }
 
       .drop-zone input[type="file"] {
@@ -699,7 +699,7 @@
         font-family: "Inter", sans-serif;
       }
       .drop-text strong {
-        color: #ec4899;
+        color: #4a8ac7;
       }
       .drop-name {
         font-size: 12px;
@@ -741,7 +741,7 @@
 
       .stat-card {
         background: linear-gradient(150deg, #262e3d 0%, #1e1e1e 60%);
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 12px;
         padding: 20px 22px;
         cursor: pointer;
@@ -751,9 +751,9 @@
           box-shadow 0.15s;
       }
       .stat-card:hover {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(157, 23, 77, 0.25);
+        box-shadow: 0 6px 20px rgba(45, 90, 143, 0.25);
       }
 
       .stat-label {
@@ -775,7 +775,7 @@
       }
 
       .stat-blue .stat-value {
-        color: #ec4899;
+        color: #4a8ac7;
       }
       .stat-green .stat-value {
         color: #4ade80;
@@ -858,7 +858,7 @@
         transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .bar-fill-blue {
-        background: linear-gradient(90deg, #9d174d, #4a8fd4);
+        background: linear-gradient(90deg, #2d5a8f, #4a8fd4);
       }
       .bar-fill-red {
         background: linear-gradient(90deg, #a83232, #e05555);
@@ -889,7 +889,7 @@
         margin: 0 -4px;
       }
       .bar-chart-row.bar-chart-clickable:hover {
-        background: rgba(157, 23, 77, 0.1);
+        background: rgba(45, 90, 143, 0.1);
       }
       .bar-chart-row.bar-chart-clickable:hover .bar-chart-label {
         color: #7ab3e0;
@@ -907,7 +907,7 @@
         pointer-events: none;
         z-index: 300;
         background: #1a2535;
-        border: 1px solid #9d174d;
+        border: 1px solid #2d5a8f;
         border-radius: 8px;
         padding: 7px 12px;
         font-family: "Inter", sans-serif;
@@ -946,13 +946,13 @@
         border-bottom: none;
       }
       .convo-row:hover {
-        background: rgba(157, 23, 77, 0.12);
+        background: rgba(45, 90, 143, 0.12);
       }
       .convo-avatar {
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #9d174d, #1a3a5c);
+        background: linear-gradient(135deg, #2d5a8f, #1a3a5c);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -990,8 +990,8 @@
       .convo-badge {
         font-size: 11px;
         color: #7ab3e0;
-        background: rgba(157, 23, 77, 0.18);
-        border: 1px solid rgba(157, 23, 77, 0.25);
+        background: rgba(45, 90, 143, 0.18);
+        border: 1px solid rgba(45, 90, 143, 0.25);
         border-radius: 12px;
         padding: 2px 8px;
         flex-shrink: 0;
@@ -1020,7 +1020,7 @@
         max-width: 95vw;
         height: 100vh;
         background: #181f2a;
-        border-left: 1px solid #4a0932;
+        border-left: 1px solid #2a3d5c;
         z-index: 201;
         transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
@@ -1032,7 +1032,7 @@
       }
       .drawer-header {
         padding: 20px 24px 16px;
-        border-bottom: 1px solid #4a0932;
+        border-bottom: 1px solid #2a3d5c;
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
@@ -1085,7 +1085,7 @@
       }
       .msg-user {
         align-self: flex-end;
-        background: #9d174d;
+        background: #2d5a8f;
         color: #e8f0f8;
         border-bottom-right-radius: 4px;
       }
@@ -1093,7 +1093,7 @@
         align-self: flex-start;
         background: #262e3d;
         color: #c8d8e8;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-bottom-left-radius: 4px;
       }
       .msg-role-label {
@@ -1117,7 +1117,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 10px 8px;
-        border-bottom: 1px solid #1a0a14;
+        border-bottom: 1px solid #1e2533;
         font-size: 13px;
         font-family: "Inter", sans-serif;
         cursor: pointer;
@@ -1126,7 +1126,7 @@
         margin: 0 -8px;
       }
       .source-row:hover {
-        background: rgba(157, 23, 77, 0.12);
+        background: rgba(45, 90, 143, 0.12);
       }
       .source-row:hover .source-name {
         color: #7ab3e0;
@@ -1139,7 +1139,7 @@
         color: #ccc;
       }
       .source-count {
-        color: #ec4899;
+        color: #4a8ac7;
         font-weight: 700;
         font-family: "Space Grotesk", sans-serif;
       }
@@ -1177,14 +1177,14 @@
       }
 
       .kb-pill-ingest {
-        background: rgba(236, 72, 153, 0.12);
-        color: #f9a8d4;
-        border-color: rgba(236, 72, 153, 0.25);
+        background: rgba(74, 138, 199, 0.12);
+        color: #7db8e8;
+        border-color: rgba(74, 138, 199, 0.25);
       }
       .kb-pill-ingest.active {
-        background: rgba(236, 72, 153, 0.18);
+        background: rgba(74, 138, 199, 0.18);
         color: #a8d4f5;
-        border-color: rgba(236, 72, 153, 0.4);
+        border-color: rgba(74, 138, 199, 0.4);
       }
 
       .kb-pill-sources {
@@ -1219,7 +1219,7 @@
       /* ── Playground ─────────────────────────────────────────────────────────── */
       .pg-chunk-card {
         background: linear-gradient(150deg, #1a2030 0%, #141414 100%);
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 10px;
         padding: 16px 20px;
         margin-bottom: 12px;
@@ -1235,7 +1235,7 @@
       .pg-chunk-source {
         font-size: 11px;
         font-weight: 700;
-        color: #ec4899;
+        color: #4a8ac7;
         letter-spacing: 0.1em;
         text-transform: uppercase;
       }
@@ -1330,7 +1330,7 @@
 
       .source-card {
         background: linear-gradient(150deg, #1e2636 0%, #191919 60%);
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 14px;
         padding: 20px 22px;
         transition:
@@ -1365,10 +1365,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(236, 72, 153, 0.08);
-        border: 1px solid rgba(236, 72, 153, 0.15);
+        background: rgba(74, 138, 199, 0.08);
+        border: 1px solid rgba(74, 138, 199, 0.15);
         border-radius: 10px;
-        color: #ec4899;
+        color: #4a8ac7;
       }
 
       .source-card-name {
@@ -1446,7 +1446,7 @@
         font-size: 11px;
         font-weight: 600;
         color: #666;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         background: transparent;
         cursor: pointer;
         transition: all 0.15s;
@@ -1484,9 +1484,9 @@
         color: #7a9ab8;
         margin: 8px 0 4px;
         padding: 6px 10px;
-        background: rgba(236, 72, 153, 0.06);
+        background: rgba(74, 138, 199, 0.06);
         border-radius: 6px;
-        border-left: 2px solid #9d174d;
+        border-left: 2px solid #2d5a8f;
         font-family: "Inter", sans-serif;
         line-height: 1.5;
         display: flex;
@@ -1514,7 +1514,7 @@
       }
       .source-context-edit-btn:hover {
         opacity: 1;
-        color: #ec4899;
+        color: #4a8ac7;
       }
 
       .source-context-add-btn {
@@ -1531,7 +1531,7 @@
       }
       .source-context-add-btn:hover {
         opacity: 1;
-        color: #ec4899;
+        color: #4a8ac7;
       }
 
       .source-context-editor {
@@ -1544,8 +1544,8 @@
 
       .source-context-editor textarea {
         width: 100%;
-        background: #0f0009;
-        border: 1px solid #9d174d;
+        background: #0e1420;
+        border: 1px solid #2d5a8f;
         border-radius: 6px;
         color: #d4e2f0;
         font-size: 12px;
@@ -1565,8 +1565,8 @@
       .sources-empty {
         text-align: center;
         padding: 56px 24px;
-        background: linear-gradient(150deg, #1a0a14 0%, #181818 60%);
-        border: 1px dashed #4a0932;
+        background: linear-gradient(150deg, #1e2533 0%, #181818 60%);
+        border: 1px dashed #2a3d5c;
         border-radius: 12px;
       }
 
@@ -1599,7 +1599,7 @@
       .leads-export-all-btn {
         padding: 8px 16px;
         background: transparent;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 8px;
         color: #88aacc;
         font-size: 12px;
@@ -1610,15 +1610,15 @@
         margin-top: 4px;
       }
       .leads-export-all-btn:hover {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         color: #fff;
-        background: rgba(236, 72, 153, 0.08);
+        background: rgba(74, 138, 199, 0.08);
       }
 
       .lead-card {
         background: linear-gradient(150deg, #1e2636, #1c1c1c);
-        border: 1px solid #4a0932;
-        border-left: 4px solid #4a0932;
+        border: 1px solid #2a3d5c;
+        border-left: 4px solid #2a3d5c;
         border-radius: 12px;
         padding: 18px 22px;
         margin-bottom: 14px;
@@ -1639,7 +1639,7 @@
         border-left-color: #f59e0b;
       }
       .lead-card.score-cold {
-        border-left-color: #ec4899;
+        border-left-color: #4a8ac7;
       }
       .lead-card.score-none {
         border-left-color: #3a4a5c;
@@ -1675,8 +1675,8 @@
         color: #f59e0b;
       }
       .score-badge.COLD {
-        background: rgba(236, 72, 153, 0.15);
-        color: #f9a8d4;
+        background: rgba(74, 138, 199, 0.15);
+        color: #7db8e8;
       }
 
       .lead-contact {
@@ -1688,7 +1688,7 @@
         font-family: "Inter", sans-serif;
       }
       .lead-contact a {
-        color: #ec4899;
+        color: #4a8ac7;
         text-decoration: none;
       }
       .lead-contact a:hover {
@@ -1743,12 +1743,12 @@
         gap: 4px;
       }
       .lead-btn-email {
-        border-color: #4a0932;
+        border-color: #2a3d5c;
         color: #88aacc;
         background: transparent;
       }
       .lead-btn-email:hover {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         color: #fff;
       }
       .lead-btn-crm {
@@ -1765,12 +1765,12 @@
         pointer-events: none;
       }
       .lead-btn-export {
-        border-color: #4a0932;
+        border-color: #2a3d5c;
         color: #778899;
         background: transparent;
       }
       .lead-btn-export:hover {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         color: #ccc;
       }
 
@@ -1792,7 +1792,7 @@
       .ticket-filter-btn {
         padding: 6px 14px;
         border-radius: 20px;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         background: transparent;
         color: #888;
         font-size: 12px;
@@ -1801,12 +1801,12 @@
         transition: all 0.15s;
       }
       .ticket-filter-btn:hover {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         color: #ccc;
       }
       .ticket-filter-btn.active {
-        background: #ec4899;
-        border-color: #ec4899;
+        background: #4a8ac7;
+        border-color: #4a8ac7;
         color: #fff;
       }
 
@@ -1819,7 +1819,7 @@
       .ticket-urgency-btn {
         padding: 5px 12px;
         border-radius: 20px;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         background: transparent;
         color: #888;
         font-size: 11px;
@@ -1843,11 +1843,11 @@
       .ticket-urgency-btn[data-urgency="medium"] .dot   { background: #f59e0b; }
       .ticket-urgency-btn[data-urgency="low"].active    { background: #4ade8022; border-color: #4ade80; color: #4ade80; }
       .ticket-urgency-btn[data-urgency="low"] .dot      { background: #4ade80; }
-      .ticket-urgency-btn[data-urgency="all"].active    { background: #ec4899; border-color: #ec4899; color: #fff; }
+      .ticket-urgency-btn[data-urgency="all"].active    { background: #4a8ac7; border-color: #4a8ac7; color: #fff; }
 
       .ticket-card {
         background: linear-gradient(150deg, #1e2636, #1c1c1c);
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 10px;
         padding: 16px 18px;
         margin-bottom: 12px;
@@ -1888,7 +1888,7 @@
       .ticket-id {
         font-family: "Space Grotesk", sans-serif;
         font-size: 11px;
-        color: #ec4899;
+        color: #4a8ac7;
         font-weight: 700;
         letter-spacing: 0.5px;
       }
@@ -1940,7 +1940,7 @@
       }
       .ticket-visitor-email a {
         font-size: 12px;
-        color: #ec4899;
+        color: #4a8ac7;
         font-family: "Inter", sans-serif;
         text-decoration: none;
       }
@@ -1969,7 +1969,7 @@
       .ticket-status-select {
         background: #1a2535;
         color: #e0e8f4;
-        border: 1px solid #4a0932;
+        border: 1px solid #2a3d5c;
         border-radius: 6px;
         padding: 5px 10px;
         font-size: 11px;
@@ -1978,7 +1978,7 @@
         outline: none;
       }
       .ticket-status-select:focus {
-        border-color: #ec4899;
+        border-color: #4a8ac7;
       }
 
       .ticket-action-btns {
@@ -1998,17 +1998,17 @@
       }
       .ticket-btn-email {
         background: transparent;
-        border-color: #4a0932;
+        border-color: #2a3d5c;
         color: #aaa;
       }
       .ticket-btn-email:hover {
         background: #1a2a40;
-        border-color: #ec4899;
+        border-color: #4a8ac7;
         color: #7aaddb;
       }
       .ticket-btn-crm {
         background: transparent;
-        border-color: #4a0932;
+        border-color: #2a3d5c;
         color: #aaa;
       }
       .ticket-btn-crm:hover {
@@ -2404,7 +2404,7 @@
           border: 1px solid transparent;
         }
         #app .nav-logout {
-          border-color: #4a0932;
+          border-color: #2a3d5c;
           color: #8ea5be;
         }
         #app .app-body {
@@ -2488,7 +2488,7 @@
             rx="19"
             ry="18"
             fill="none"
-            stroke="#9d174d"
+            stroke="#2d5a8f"
             stroke-width="2"
           />
           <g
@@ -2503,18 +2503,18 @@
               rx="13"
               ry="9.5"
               fill="none"
-              stroke="#9d174d"
+              stroke="#2d5a8f"
               stroke-width="1.5"
             />
           </g>
-          <circle cx="24" cy="25" r="3" fill="#ec4899" />
+          <circle cx="24" cy="25" r="3" fill="#4a8ac7" />
           <g
             style="
               transform-origin: 24px 25px;
               animation: spin 8s linear infinite;
             "
           >
-            <circle cx="37" cy="16" r="2" fill="#ec4899" opacity="0.7" />
+            <circle cx="37" cy="16" r="2" fill="#4a8ac7" opacity="0.7" />
           </g>
           <line
             x1="52"
@@ -2589,7 +2589,7 @@
                   animation: spin 8s linear infinite;
                 "
               >
-                <circle cx="35" cy="13" r="2.5" fill="#f9a8d4" />
+                <circle cx="35" cy="13" r="2.5" fill="#7db8e8" />
                 <circle cx="35" cy="13" r="4" fill="rgba(125,184,232,0.2)" />
               </g>
               <defs>
@@ -2601,12 +2601,12 @@
                   y2="44"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop offset="0%" stop-color="#ec4899" />
-                  <stop offset="100%" stop-color="#f9a8d4" />
+                  <stop offset="0%" stop-color="#4a8ac7" />
+                  <stop offset="100%" stop-color="#7db8e8" />
                 </linearGradient>
                 <radialGradient id="cg" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#f9a8d4" />
-                  <stop offset="100%" stop-color="#9d174d" />
+                  <stop offset="0%" stop-color="#7db8e8" />
+                  <stop offset="100%" stop-color="#2d5a8f" />
                 </radialGradient>
               </defs>
             </svg>
@@ -2660,7 +2660,7 @@
             rx="19"
             ry="18"
             fill="none"
-            stroke="#9d174d"
+            stroke="#2d5a8f"
             stroke-width="2"
           />
           <g
@@ -2675,18 +2675,18 @@
               rx="13"
               ry="9.5"
               fill="none"
-              stroke="#9d174d"
+              stroke="#2d5a8f"
               stroke-width="1.5"
             />
           </g>
-          <circle cx="24" cy="25" r="3" fill="#ec4899" />
+          <circle cx="24" cy="25" r="3" fill="#4a8ac7" />
           <g
             style="
               transform-origin: 24px 25px;
               animation: spin 8s linear infinite;
             "
           >
-            <circle cx="37" cy="16" r="2" fill="#ec4899" opacity="0.7" />
+            <circle cx="37" cy="16" r="2" fill="#4a8ac7" opacity="0.7" />
           </g>
           <line
             x1="52"
@@ -2817,7 +2817,7 @@
                   animation: spin 8s linear infinite;
                 "
               >
-                <circle cx="34" cy="13" r="2" fill="#f9a8d4" opacity="0.8" />
+                <circle cx="34" cy="13" r="2" fill="#7db8e8" opacity="0.8" />
               </g>
               <defs>
                 <linearGradient
@@ -2828,12 +2828,12 @@
                   y2="44"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop offset="0%" stop-color="#ec4899" />
-                  <stop offset="100%" stop-color="#f9a8d4" />
+                  <stop offset="0%" stop-color="#4a8ac7" />
+                  <stop offset="100%" stop-color="#7db8e8" />
                 </linearGradient>
                 <radialGradient id="ps-cg" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#f9a8d4" />
-                  <stop offset="100%" stop-color="#9d174d" />
+                  <stop offset="0%" stop-color="#7db8e8" />
+                  <stop offset="100%" stop-color="#2d5a8f" />
                 </radialGradient>
               </defs>
             </svg>
@@ -3431,7 +3431,7 @@
               <div id="pg-response-wrap" style="display: none">
                 <div
                   class="card"
-                  style="margin-bottom: 20px; border-color: #9d174d"
+                  style="margin-bottom: 20px; border-color: #2d5a8f"
                 >
                   <div class="card-title">ECHO Response</div>
                   <div
@@ -3876,9 +3876,9 @@
                     font-size: 10px;
                     font-weight: 700;
                     letter-spacing: 0.08em;
-                    background: rgba(236, 72, 153, 0.15);
-                    border: 1px solid rgba(236, 72, 153, 0.3);
-                    color: #ec4899;
+                    background: rgba(74, 138, 199, 0.15);
+                    border: 1px solid rgba(74, 138, 199, 0.3);
+                    color: #4a8ac7;
                   "
                   >CUSTOM</span
                 >
@@ -4089,7 +4089,7 @@
                       class="form-input"
                       id="wc-primary-color"
                       type="text"
-                      placeholder="#9d174d"
+                      placeholder="#2d5a8f"
                       style="flex: 1"
                     />
                   </div>
@@ -4240,7 +4240,7 @@
                 "
               >
                 Paste this single line into any website's HTML, just before
-                <code style="color: #ec4899">&lt;/body&gt;</code>. The widget
+                <code style="color: #4a8ac7">&lt;/body&gt;</code>. The widget
                 loads its config automatically from VAULT.
               </p>
               <div
@@ -4256,7 +4256,7 @@
                   id="embed-snippet"
                   style="
                     font-size: 12px;
-                    color: #f9a8d4;
+                    color: #7db8e8;
                     font-family: &quot;Courier New&quot;, monospace;
                     word-break: break-all;
                     line-height: 1.6;
@@ -5773,7 +5773,7 @@
                 const preview = content.slice(0, 300);
                 const hasMore = content.length > 300;
                 const contextLine = c.context
-                  ? `<div style="font-size:11px;color:#7a9ab8;margin-bottom:8px;font-style:italic;padding:4px 8px;background:rgba(74,138,199,0.07);border-radius:5px;border-left:2px solid #9d174d">📌 ${escapeHtml(c.context)}</div>`
+                  ? `<div style="font-size:11px;color:#7a9ab8;margin-bottom:8px;font-style:italic;padding:4px 8px;background:rgba(74,138,199,0.07);border-radius:5px;border-left:2px solid #2d5a8f">📌 ${escapeHtml(c.context)}</div>`
                   : "";
                 return `<div class="pg-chunk-card">
             <div class="pg-chunk-header">
@@ -5782,7 +5782,7 @@
             </div>
             ${contextLine}
             <div class="pg-chunk-preview" id="pg-preview-${i}">${escapeHtml(preview)}${hasMore ? "…" : ""}</div>
-            ${hasMore ? `<button onclick="toggleChunk(${i})" id="pg-toggle-${i}" style="margin-top:8px;background:none;border:none;color:#ec4899;cursor:pointer;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;padding:0;letter-spacing:0.05em">▼ Show full chunk</button>` : ""}
+            ${hasMore ? `<button onclick="toggleChunk(${i})" id="pg-toggle-${i}" style="margin-top:8px;background:none;border:none;color:#4a8ac7;cursor:pointer;font-size:11px;font-family:'Space Grotesk',sans-serif;font-weight:600;padding:0;letter-spacing:0.05em">▼ Show full chunk</button>` : ""}
           </div>`;
               })
               .join("");
@@ -5880,6 +5880,41 @@
         }
       }
 
+      // ── Client theming ──────────────────────────────────────────────────────────
+      // Computes lighter/darker variants from a hex color and injects CSS overrides
+      function applyClientTheme(primaryHex) {
+        const hex = (primaryHex || "#4a8ac7").replace("#", "");
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const dark = `rgba(${r},${g},${b},0.15)`;
+        const mid  = `rgba(${r},${g},${b},0.25)`;
+        const glow = `rgba(${r},${g},${b},0.08)`;
+        let el = document.getElementById("client-theme-override");
+        if (!el) { el = document.createElement("style"); el.id = "client-theme-override"; document.head.appendChild(el); }
+        el.textContent = `
+          :root {
+            --accent: ${primaryHex};
+            --accent-dark: ${dark};
+            --accent-mid: ${mid};
+            --accent-glow: ${glow};
+          }
+          .top-nav { border-bottom-color: ${primaryHex} !important; }
+          .nav-link.active { color: ${primaryHex} !important; background: ${dark} !important; border-color: ${mid} !important; }
+          .nav-link:hover { color: ${primaryHex} !important; }
+          .btn-primary, .btn-blue { background: ${primaryHex} !important; border-color: ${primaryHex} !important; }
+          .btn-primary:hover, .btn-blue:hover { opacity: 0.85; }
+          .card, .panel, .settings-card { border-color: ${mid} !important; }
+          input:focus, textarea:focus, select:focus { border-color: ${primaryHex} !important; box-shadow: 0 0 0 3px ${dark} !important; }
+          .badge, .tag-positive, .status-dot.active { background: ${dark} !important; color: ${primaryHex} !important; border-color: ${mid} !important; }
+          .orb-glow { background: radial-gradient(circle, ${glow} 0%, transparent 70%) !important; }
+          body::before { background-image: linear-gradient(${glow} 1px, transparent 1px), linear-gradient(90deg, ${glow} 1px, transparent 1px) !important; }
+          .login-card { border-color: ${mid} !important; }
+          .vault-title { background: linear-gradient(135deg, #fff 30%, ${primaryHex}) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+          a { color: ${primaryHex} !important; }
+        `;
+      }
+
       // Called when the client selector changes — reload all data for the new client
       function switchClient(clientId) {
         currentClientId = resolveClientUuid(clientId) || clientId;
@@ -5912,9 +5947,10 @@
           document.getElementById("wc-brand-line").value = wc.brand_line || "";
           document.getElementById("wc-greeting").value = wc.greeting || "";
           document.getElementById("wc-primary-color").value =
-            wc.primary_color || "#9d174d";
+            wc.primary_color || "#2d5a8f";
           document.getElementById("wc-color-picker").value =
-            wc.primary_color || "#9d174d";
+            wc.primary_color || "#2d5a8f";
+          applyClientTheme(wc.primary_color || "#4a8ac7");
           document.getElementById("wc-starters").value = (
             wc.starters || []
           ).join("\n");
