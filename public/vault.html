@@ -5874,6 +5874,11 @@
               clientsIndex[0].id || clientsIndex[0].slug,
             );
             sel.value = currentClientId;
+            // Apply theme for the initially selected client
+            try {
+              const d = await callApi("/client-settings-get", { client_id: currentClientId });
+              applyClientTheme(d.widget_config?.primary_color || "#4a8ac7");
+            } catch (_) {}
           }
         } catch (e) {
           console.warn("Could not load clients:", e.message);
@@ -5916,8 +5921,13 @@
       }
 
       // Called when the client selector changes — reload all data for the new client
-      function switchClient(clientId) {
+      async function switchClient(clientId) {
         currentClientId = resolveClientUuid(clientId) || clientId;
+        // Always update theme immediately when switching clients
+        try {
+          const data = await callApi("/client-settings-get", { client_id: currentClientId });
+          applyClientTheme(data.widget_config?.primary_color || "#4a8ac7");
+        } catch (e) {}
         // Reload whichever page is currently active
         const activePage = document
           .querySelector(".page.active")
