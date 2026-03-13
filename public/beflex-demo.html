@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BeFlex · Flex Widget Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #ffffff; color: #0a0a0a; line-height: 1.5;
+    }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px); border-bottom: 1px solid #f0f0f0; z-index: 100;
+    }
+    .nav-logo { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; }
+    .nav-logo span { color: #555; font-weight: 400; }
+    .nav-demo-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #fff; background: #0a0a0a; padding: 3px 9px; border-radius: 100px; margin-left: 10px;
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { font-size: 13px; font-weight: 500; color: #666; text-decoration: none; }
+    .nav-links a:hover { color: #0a0a0a; }
+    .nav-cta {
+      background: #0a0a0a; color: #fff; padding: 8px 18px;
+      border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;
+    }
+
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 100px 24px 80px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+      color: #666; border: 1px solid #e0e0e0; padding: 5px 12px; border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #0a0a0a; }
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 72px); font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1.0; color: #0a0a0a;
+      max-width: 820px; margin-bottom: 22px;
+    }
+    .hero-sub {
+      font-size: 17px; color: #666; max-width: 500px;
+      margin-bottom: 40px; line-height: 1.65;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-black {
+      background: #0a0a0a; color: #fff; padding: 13px 26px;
+      border-radius: 9px; font-size: 14px; font-weight: 600; text-decoration: none;
+    }
+    .btn-outline {
+      background: transparent; color: #0a0a0a; padding: 13px 26px;
+      border-radius: 9px; border: 1.5px solid #ddd;
+      font-size: 14px; font-weight: 600; text-decoration: none;
+    }
+
+    .stats {
+      display: flex; justify-content: center; gap: 56px;
+      padding: 40px 24px; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 900; letter-spacing: -0.03em; }
+    .stat-lbl { font-size: 12px; color: #999; margin-top: 4px; }
+
+    .section { max-width: 1060px; margin: 0 auto; padding: 80px 24px; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; margin-bottom: 14px; }
+    .section-title { font-size: clamp(24px, 4vw, 40px); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 14px; }
+    .section-sub { font-size: 15px; color: #666; max-width: 480px; line-height: 1.65; margin-bottom: 48px; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .step { padding: 28px; border: 1px solid #f0f0f0; border-radius: 14px; }
+    .step-n { font-size: 10px; font-weight: 700; color: #ccc; letter-spacing: 0.08em; margin-bottom: 14px; }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 13px; color: #777; line-height: 1.6; }
+
+    .providers {
+      background: #fafafa; padding: 56px 24px; text-align: center;
+    }
+    .providers-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #ccc; margin-bottom: 28px; }
+    .providers-row { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+    .provider { font-size: 15px; font-weight: 700; color: #ccc; letter-spacing: -0.02em; }
+
+    .cta-dark { background: #0a0a0a; text-align: center; padding: 80px 24px; }
+    .cta-dark h2 { font-size: clamp(24px, 4vw, 46px); font-weight: 900; letter-spacing: -0.03em; color: #fff; margin-bottom: 14px; }
+    .cta-dark p { font-size: 15px; color: rgba(255,255,255,0.5); max-width: 420px; margin: 0 auto 32px; line-height: 1.65; }
+    .btn-white {
+      background: #fff; color: #0a0a0a; padding: 13px 26px;
+      border-radius: 9px; font-size: 14px; font-weight: 600;
+      text-decoration: none; display: inline-block;
+    }
+
+    footer {
+      border-top: 1px solid #f0f0f0; padding: 28px 40px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo { font-size: 14px; font-weight: 700; }
+    .footer-copy { font-size: 12px; color: #ccc; }
+
+    /* DGC demo banner */
+    .demo-banner {
+      position: fixed; top: 60px; left: 0; right: 0;
+      background: #111; color: rgba(255,255,255,0.7);
+      font-size: 11px; font-weight: 500; text-align: center;
+      padding: 7px 16px; z-index: 99; letter-spacing: 0.02em;
+      border-bottom: 1px solid #1f1f1f;
+    }
+    .demo-banner strong { color: #fff; }
+
+    @media (max-width: 768px) {
+      .stats { gap: 28px; flex-wrap: wrap; }
+      .steps { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-banner">
+    <strong>DGC Demo</strong> · This is a live Beflex chatbot demo — click the icon in the bottom-right corner to test Flex, the workspace advisor.
+  </div>
+
+  <nav>
+    <div style="display:flex;align-items:center;">
+      <div class="nav-logo">be<span>flex</span></div>
+      <span class="nav-demo-badge">Demo</span>
+    </div>
+    <div class="nav-links">
+      <a href="#">How it Works</a>
+      <a href="#">For Providers</a>
+      <a href="#">Locations</a>
+    </div>
+    <a href="#" class="nav-cta">Find Space</a>
+  </nav>
+
+  <section class="hero">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Free workspace advisory service
+    </div>
+    <h1>A smarter way to<br>find flexible workspace</h1>
+    <p class="hero-sub">
+      Tell us what you need. We match you with the perfect office space from 50,000+ locations worldwide.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn-black">Find workspace</a>
+      <a href="#" class="btn-outline">How it works</a>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">50k+</div><div class="stat-lbl">Offices worldwide</div></div>
+    <div class="stat"><div class="stat-num">200+</div><div class="stat-lbl">Companies placed</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Free to companies</div></div>
+    <div class="stat"><div class="stat-num">1 day</div><div class="stat-lbl">Avg. response</div></div>
+  </div>
+
+  <section class="section">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Three steps to your perfect workspace</div>
+    <p class="section-sub">Our advisors do the work. You get a curated shortlist without the hassle.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">01</div>
+        <h3>Tell us what you need</h3>
+        <p>Share your location, team size, budget, and requirements — or just chat with Flex in the corner.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <h3>We shortlist the best options</h3>
+        <p>Our advisors match your brief against 50,000+ spaces and send a curated shortlist within one business day.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <h3>Move in</h3>
+        <p>We handle viewings, negotiations, and paperwork. Completely free — we're paid by workspace providers.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="providers">
+    <div class="providers-lbl">Access spaces from leading providers</div>
+    <div class="providers-row">
+      <div class="provider">WeWork</div>
+      <div class="provider">FORA</div>
+      <div class="provider">Huckletree</div>
+      <div class="provider">Canvas</div>
+      <div class="provider">Industrious</div>
+      <div class="provider">The Office Group</div>
+    </div>
+  </div>
+
+  <div class="cta-dark">
+    <h2>Ready to find your workspace?</h2>
+    <p>Chat with Flex in the corner, or click below and we'll get back to you within one business day.</p>
+    <a href="#" class="btn-white">Start your search</a>
+  </div>
+
+  <footer>
+    <div class="footer-logo">beflex</div>
+    <div class="footer-copy">© 2025 BeFlex · Demo by DGC</div>
+  </footer>
+
+  <!-- Flex widget — connects to DGCBeflex local server on port 3003 -->
+  <script>
+    // Override server URL for cross-origin demo use
+    window.__FLEX_SERVER__ = "http://localhost:3003";
+  </script>
+  <script src="http://localhost:3003/widget.js"></script>
+
+</body>
+</html>
