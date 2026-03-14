@@ -2774,14 +2774,6 @@
               Settings
             </button>
           </div>
-          <button
-            class="nav-link"
-            onclick="window.open('/beflex-demo.html', '_blank')"
-            style="color: #5beefa; border-color: rgba(91,238,250,0.2);"
-            title="Open Beflex live demo in new tab"
-          >
-            Beflex Demo ↗
-          </button>
           <button class="nav-logout" onclick="doLogout()">Sign out</button>
         </div>
       </nav>
@@ -3852,62 +3844,39 @@
               </p>
             </div>
 
-            <!-- ── Register New Client ─────────────────────────────────────────── -->
-            <div class="card" style="margin-bottom: 20px; border-color: rgba(91,238,250,0.2);">
-              <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
-                <span>Register New Client</span>
-                <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#5beefa;background:rgba(91,238,250,0.1);border:1px solid rgba(91,238,250,0.25);padding:3px 9px;border-radius:4px;">Setup</span>
-              </div>
-              <p class="card-desc" style="font-size:12px;color:#555;margin-bottom:16px;">Add a new client to the system. Their bot will use the system prompt you define here.</p>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                <div>
-                  <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Client Name</label>
-                  <input id="new-client-name" type="text" placeholder="e.g. BeFlex" value="BeFlex"
-                    style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:inherit;outline:none;" />
+            <!-- ── Register New Client — DGC only ─────────────────────────────── -->
+            <div id="register-client-section" style="display:none;margin-bottom:20px;">
+              <div class="card" style="border-color: rgba(74,138,199,0.25);">
+                <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                  <span>Register New Client</span>
+                  <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4a8ac7;background:rgba(74,138,199,0.1);border:1px solid rgba(74,138,199,0.2);padding:3px 9px;border-radius:4px;">DGC Admin</span>
                 </div>
-                <div>
-                  <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Slug (URL key)</label>
-                  <input id="new-client-slug" type="text" placeholder="e.g. beflex" value="beflex"
-                    style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:monospace;outline:none;" />
+                <p class="card-desc" style="font-size:12px;color:#555;margin-bottom:16px;">Add a new client to the platform. They'll appear in the client selector and get their own managed bot.</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                  <div>
+                    <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Client Name</label>
+                    <input id="new-client-name" type="text" placeholder="e.g. BeFlex"
+                      style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:inherit;outline:none;" />
+                  </div>
+                  <div>
+                    <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Slug</label>
+                    <input id="new-client-slug" type="text" placeholder="e.g. beflex"
+                      style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:monospace;outline:none;" />
+                  </div>
                 </div>
-              </div>
-              <div style="margin-bottom:12px;">
-                <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">System Prompt</label>
-                <textarea id="new-client-prompt" rows="8"
-                  style="width:100%;padding:10px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:12px;color:#ccc;font-family:inherit;outline:none;resize:vertical;line-height:1.6;">You are Flex, the AI workspace advisor for BeFlex (beflex.co.uk). BeFlex is a free workspace matching service that helps companies find flexible office space from 50,000+ locations worldwide — including providers like WeWork, FORA, Huckletree, Canvas, and Industrious.
-
-Your role:
-- Help visitors understand what type of workspace they need
-- Answer questions about flexible workspace options (hot desks, private offices, dedicated desks, co-working, meeting rooms)
-- Explain that BeFlex's advisory service is completely free to companies searching for space
-- Qualify leads by asking about: location/city, team size, monthly budget, when they need it, any requirements
-- Encourage visitors to book a free consultation with a BeFlex advisor
-
-Tone: Professional, knowledgeable, warm, and concise. No emojis. Sound like a human workspace expert, not a chatbot.
-
-When someone wants to find space, collect:
-1. Location / city
-2. Team size (number of people)
-3. Budget (monthly, GBP)
-4. Start date
-5. Any specific requirements (parking, meeting rooms, dog-friendly, 24/7 access, etc.)
-
-Once you have enough detail, ask for their name and email so a BeFlex advisor can follow up with tailored options.
-
-Key facts:
-- BeFlex covers UK (London, Manchester, Birmingham, etc.) and major global cities
-- The service is 100% free to companies — BeFlex is paid by workspace providers
-- Flexible office leases range from 1 month to 2+ years
-- Average London cost: £300–£800/desk/month depending on location and spec
-- BeFlex advisors respond within 1 business day</textarea>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;">
-                <button onclick="registerNewClient()"
-                  style="padding:10px 20px;background:#5beefa;color:#000;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
-                  onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
-                  Register Client
-                </button>
-                <span id="register-client-feedback" style="font-size:12px;color:#4ade80;display:none;"></span>
+                <div style="margin-bottom:14px;">
+                  <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">System Prompt</label>
+                  <textarea id="new-client-prompt" rows="7" placeholder="You are an AI assistant for [Client]..."
+                    style="width:100%;padding:10px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:12px;color:#ccc;font-family:inherit;outline:none;resize:vertical;line-height:1.6;"></textarea>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <button onclick="registerNewClient()"
+                    style="padding:10px 22px;background:#4a8ac7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
+                    onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">
+                    Create Client
+                  </button>
+                  <span id="register-client-feedback" style="font-size:12px;color:#4ade80;display:none;"></span>
+                </div>
               </div>
             </div>
 
@@ -6023,6 +5992,11 @@ Key facts:
       // Called when the client selector changes — reload all data for the new client
       async function switchClient(clientId) {
         currentClientId = resolveClientUuid(clientId) || clientId;
+        // Show "Register New Client" only when the DGC client is selected
+        const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc");
+        const isDGC = dgcClient && currentClientId === dgcClient.id;
+        const regSection = document.getElementById("register-client-section");
+        if (regSection) regSection.style.display = isDGC ? "block" : "none";
         // Always update theme immediately when switching clients
         try {
           const data = await callApi("/client-settings-get", { client_id: currentClientId });
