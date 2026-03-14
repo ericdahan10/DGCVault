@@ -1009,6 +1009,15 @@
 
   // ─── Bootstrap ─────────────────────────────────────────────────────────────
   async function init() {
+    // Allow pages to inject config directly via window.__ECHO_WIDGET_CONFIG__
+    // This lets demo pages set branding without needing a Supabase client record
+    if (window.__ECHO_WIDGET_CONFIG__) {
+      const cfg = { worker_url: WORKER_URL, api_key: "", client_id: clientId, ...window.__ECHO_WIDGET_CONFIG__ };
+      injectStyles(cfg);
+      injectHTML(cfg);
+      initChat(cfg);
+      return;
+    }
     try {
       const res = await fetch(WIDGET_CONFIG_URL, { cache: "no-store" });
       if (!res.ok) throw new Error("Config fetch failed");
