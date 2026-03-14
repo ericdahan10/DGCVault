@@ -5965,6 +5965,13 @@
           document.getElementById("new-client-slug").value = "";
           document.getElementById("new-client-prompt").value = "";
           await loadClients();
+          // Auto-switch to the newly created client so Widget Appearance edits go to the right place
+          const newClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === slug.toLowerCase());
+          if (newClient) {
+            const sel = document.getElementById("client-selector");
+            sel.value = newClient.id;
+            await switchClient(newClient.id);
+          }
           setTimeout(() => { fb.style.display = "none"; }, 8000);
         } catch (err) {
           fb.textContent = "Error: " + err.message; fb.style.color = "#ef4444";
@@ -6075,13 +6082,16 @@
             sel.appendChild(opt);
           });
           if (clientsIndex.length) {
-            // Default to DGC client; fall back to first in list
-            const dgcDefault = clientsIndex.find(
-              (c) => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc"
-            ) || clientsIndex[0];
-            currentClientId = resolveClientUuid(dgcDefault.id || dgcDefault.slug);
+            // On first load default to DGC; on subsequent refreshes keep the current selection
+            const alreadySelected = currentClientId && clientsIndex.find(c => c.id === currentClientId);
+            if (!alreadySelected) {
+              const dgcDefault = clientsIndex.find(
+                (c) => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc"
+              ) || clientsIndex[0];
+              currentClientId = resolveClientUuid(dgcDefault.id || dgcDefault.slug);
+            }
             sel.value = currentClientId;
-            // Apply theme for the initially selected client
+            // Apply theme for the selected client
             try {
               const d = await callApi("/client-settings-get", { client_id: currentClientId });
               applyClientTheme(d.widget_config?.primary_color || "#4a8ac7");
