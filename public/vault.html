@@ -4122,7 +4122,10 @@
 
             <!-- Widget Config card -->
             <div class="card" style="margin-top: 20px">
-              <div class="card-title">Widget Appearance</div>
+              <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>Widget Appearance</span>
+                <span id="widget-editing-label" style="font-size:11px;font-weight:600;font-family:'Inter',sans-serif;color:#4a8ac7;background:rgba(74,138,199,0.1);border:1px solid rgba(74,138,199,0.2);padding:3px 10px;border-radius:4px;"></span>
+              </div>
               <div
                 style="
                   display: grid;
@@ -6135,8 +6138,9 @@
           .top-nav { border-bottom-color: ${primaryHex} !important; }
           .nav-link.active { color: ${primaryHex} !important; background: ${dark} !important; border-color: ${mid} !important; }
           .nav-link:hover { color: ${primaryHex} !important; }
-          .btn-primary, .btn-blue { background: ${primaryHex} !important; border-color: ${primaryHex} !important; }
-          .btn-primary:hover, .btn-blue:hover { opacity: 0.85; }
+          /* Only tint the widget-settings save button — never ingest/action buttons */
+          #page-settings .btn-primary { background: ${primaryHex} !important; border-color: ${primaryHex} !important; }
+          #page-settings .btn-primary:hover { opacity: 0.85; }
           .card, .panel, .settings-card { border-color: ${mid} !important; }
           input:focus, textarea:focus, select:focus { border-color: ${primaryHex} !important; box-shadow: 0 0 0 3px ${dark} !important; }
           .badge, .tag-positive, .status-dot.active { background: ${dark} !important; color: ${primaryHex} !important; border-color: ${mid} !important; }
@@ -6184,6 +6188,10 @@
         const resolvedClientId =
           resolveClientUuid(currentClientId) || currentClientId;
         if (!resolvedClientId) return;
+        // Update the "editing label" so it's always clear which client you're changing
+        const client = clientsIndex.find(c => c.id === resolvedClientId || c.slug === resolvedClientId);
+        const editLabel = document.getElementById("widget-editing-label");
+        if (editLabel) editLabel.textContent = `Editing: ${client?.name || resolvedClientId}`;
         try {
           const data = await callApi("/client-settings-get", {
             client_id: resolvedClientId,
