@@ -6039,15 +6039,35 @@
                   <span style="font-size:13px;color:#888;font-family:'Inter',sans-serif;">${c.name || c.slug || c.id}</span>
                   ${deletedAgo ? `<span style="font-size:11px;color:#333;margin-left:8px;font-family:'Inter',sans-serif;">deleted ${deletedAgo}</span>` : ""}
                 </div>
-                <button onclick="restoreClient('${c.id}','${(c.name||c.slug||'').replace(/'/g,"\\'")}', this)"
-                  style="padding:6px 14px;background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
-                  onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
-                  Restore
-                </button>
+                <div style="display:flex;gap:8px;">
+                  <button onclick="restoreClient('${c.id}','${(c.name||c.slug||'').replace(/'/g,"\\'")}', this)"
+                    style="padding:6px 14px;background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
+                    onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
+                    Restore
+                  </button>
+                  <button onclick="purgeClient('${c.id}','${(c.name||c.slug||'').replace(/'/g,"\\'")}', this)"
+                    style="padding:6px 14px;background:transparent;color:#555;border:1px solid #222;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;"
+                    onmouseover="this.style.color='#fca5a5';this.style.borderColor='rgba(239,68,68,0.3)'" onmouseout="this.style.color='#555';this.style.borderColor='#222'">
+                    Delete forever
+                  </button>
+                </div>
               </div>`;
           }).join("");
         } catch (e) {
           section.style.display = "none";
+        }
+      }
+
+      async function purgeClient(clientId, clientName, btn) {
+        if (!confirm(`Permanently delete "${clientName}"? This cannot be undone.`)) return;
+        if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
+        try {
+          await callApi("/client-purge", { client_id: clientId });
+          showToast(`"${clientName}" permanently deleted`);
+          await loadDeletedClients();
+        } catch (err) {
+          showToast("Purge failed: " + err.message, "error");
+          if (btn) { btn.disabled = false; btn.textContent = "Delete forever"; }
         }
       }
 
