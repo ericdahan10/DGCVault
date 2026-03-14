@@ -3887,15 +3887,8 @@
                   <span style="color:#fca5a5;">Delete Client</span>
                   <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#ef4444;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:3px 9px;border-radius:4px;">DGC Admin</span>
                 </div>
-                <p class="card-desc" style="font-size:12px;color:#555;margin-bottom:16px;">Permanently remove a client and all their data. Select from the client dropdown above first.</p>
-                <div style="display:flex;align-items:center;gap:12px;">
-                  <button onclick="deleteCurrentClient()"
-                    style="padding:10px 22px;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
-                    onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
-                    Delete Selected Client
-                  </button>
-                  <span id="delete-client-feedback" style="font-size:12px;display:none;"></span>
-                </div>
+                <p style="font-size:12px;color:#555;margin-bottom:14px;font-family:'Inter',sans-serif;">Permanently remove a client and all their data. DGC Vault cannot be deleted.</p>
+                <div id="delete-client-list" style="display:flex;flex-direction:column;gap:8px;"></div>
               </div>
             </div>
 
@@ -5964,23 +5957,40 @@
         }
       }
 
-      async function deleteCurrentClient() {
-        const sel = document.getElementById("client-selector");
-        const clientName = sel.options[sel.selectedIndex]?.textContent || "this client";
-        const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc");
-        if (dgcClient && currentClientId === dgcClient.id) {
-          showToast("Cannot delete the DGC client", "error"); return;
+      function renderClientDeleteList() {
+        const list = document.getElementById("delete-client-list");
+        if (!list) return;
+        const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc");
+        const deletable = clientsIndex.filter(c => !dgcClient || c.id !== dgcClient.id);
+        if (!deletable.length) {
+          list.innerHTML = `<p style="font-size:12px;color:#444;font-family:'Inter',sans-serif;">No other clients to delete.</p>`;
+          return;
         }
+        list.innerHTML = deletable.map(c => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0e1420;border:1px solid #1e2a3a;border-radius:8px;">
+            <div>
+              <span style="font-size:13px;color:#ccc;font-family:'Inter',sans-serif;">${c.name || c.slug || c.id}</span>
+              ${c.slug ? `<span style="font-size:11px;color:#3a4a58;margin-left:8px;font-family:'Inter',sans-serif;">${c.slug}</span>` : ""}
+            </div>
+            <button onclick="deleteClient('${c.id}','${(c.name||c.slug||'').replace(/'/g,"\\'")}', this)"
+              style="padding:6px 14px;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
+              onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
+              Delete
+            </button>
+          </div>
+        `).join("");
+      }
+
+      async function deleteClient(clientId, clientName, btn) {
         if (!confirm(`Permanently delete "${clientName}"? This cannot be undone.`)) return;
-        const fb = document.getElementById("delete-client-feedback");
-        fb.textContent = "Deleting…"; fb.style.color = "#888"; fb.style.display = "inline";
+        if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
         try {
-          await callApi("/client-delete", { client_id: currentClientId });
-          fb.textContent = "Deleted."; fb.style.color = "#4ade80";
+          await callApi("/client-delete", { client_id: clientId });
+          showToast(`"${clientName}" deleted`);
           await loadClients();
-          setTimeout(() => { fb.style.display = "none"; }, 2000);
         } catch (err) {
-          fb.textContent = "Error: " + err.message; fb.style.color = "#ef4444";
+          showToast("Delete failed: " + err.message, "error");
+          if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
         }
       }
 
@@ -6019,6 +6029,7 @@
             if (regSection) regSection.style.display = isDGC ? "block" : "none";
             const delSection = document.getElementById("delete-client-section");
             if (delSection) delSection.style.display = isDGC ? "block" : "none";
+            renderClientDeleteList();
           }
         } catch (e) {
           console.warn("Could not load clients:", e.message);

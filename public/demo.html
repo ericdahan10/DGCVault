@@ -193,8 +193,19 @@
         // Apply accent colour to CSS var
         document.documentElement.style.setProperty("--accent", color);
 
+        // Split camelCase name into two parts — second part gets accent colour
+        // e.g. "BeFlex" → "BE" + "FLEX", "HubSpot" → "HUB" + "SPOT"
+        function accentName(str) {
+          const match = str.match(/^([A-Z]?[a-z]+)([A-Z].*)$/);
+          if (match) {
+            return `${match[1].toUpperCase()}<span style="color:var(--accent)">${match[2].toUpperCase()}</span>`;
+          }
+          return str;
+        }
+
         // Update page content
-        document.getElementById("client-badge").textContent = brandLine || name;
+        const badgeEl = document.getElementById("client-badge");
+        badgeEl.innerHTML = accentName(brandLine || name);
         document.getElementById("hero-title").textContent = `Meet your ${name} AI assistant`;
         document.getElementById("hero-subtitle").textContent =
           cfg.greeting
