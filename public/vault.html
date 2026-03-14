@@ -6201,7 +6201,7 @@
         document.getElementById("settings-reset-btn").disabled = true;
 
         try {
-          const data = await callApi("/settings-get", {});
+          const data = await callApi("/settings-get", { client_id: currentClientId });
           settingsDefaultPrompt = data.default_prompt || "";
           textarea.value = data.system_prompt || "";
           textarea.disabled = false;
@@ -6234,7 +6234,7 @@
         btn.textContent = "Saving...";
 
         try {
-          await callApi("/settings-save", { system_prompt: prompt });
+          await callApi("/settings-save", { system_prompt: prompt, client_id: currentClientId });
 
           // Update UI to reflect saved state
           const customBadge = document.getElementById("settings-custom-badge");
@@ -6272,7 +6272,7 @@
         btn.textContent = "Resetting...";
 
         try {
-          await callApi("/settings-save", { reset: true });
+          await callApi("/settings-save", { reset: true, client_id: currentClientId });
 
           // Populate textarea with the default
           document.getElementById("settings-prompt").value =
