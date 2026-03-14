@@ -4796,7 +4796,7 @@
         container.innerHTML =
           '<div style="font-size:13px;color:#555;font-family:Inter,sans-serif;padding:8px 0">Loading sources...</div>';
         try {
-          const s = await callApi("/stats", {});
+          const s = await callApi("/stats", { client_id: currentClientId });
           renderSources(s.sources || []);
         } catch {
           container.innerHTML =
@@ -5074,8 +5074,8 @@
 
         // Load stats + conversations in parallel
         const [statsResult, convosResult] = await Promise.allSettled([
-          callApi("/stats", {}),
-          callApi("/analytics-conversations", {}),
+          callApi("/stats", { client_id: currentClientId }),
+          callApi("/analytics-conversations", { client_id: currentClientId }),
         ]);
 
         // ── Stats ──
@@ -5274,7 +5274,7 @@
         document.getElementById("leads-container").innerHTML =
           '<div class="leads-empty">Loading leads...</div>';
         try {
-          const data = await callApi("/leads", {});
+          const data = await callApi("/leads", { client_id: currentClientId });
           allLeads = data.leads || [];
           renderLeads();
         } catch (e) {
@@ -5492,7 +5492,7 @@
         document.getElementById("tickets-container").innerHTML =
           "<div style=\"font-size:13px;color:#555;font-family:'Inter',sans-serif;padding:8px 0\">Loading tickets...</div>";
         try {
-          const data = await callApi("/tickets", {});
+          const data = await callApi("/tickets", { client_id: currentClientId });
           allTickets = data.tickets || [];
           renderTickets();
         } catch (e) {
@@ -5560,7 +5560,7 @@
         const visitorId = ticket?.visitor_id || ticket?.visitorId;
         if (visitorId) {
           try {
-            const data = await callApi("/analytics-conversations", { visitor_id: visitorId });
+            const data = await callApi("/analytics-conversations", { client_id: currentClientId, visitor_id: visitorId });
             const convos = data.conversations || [];
             if (convos.length) {
               const match = convos[0];
@@ -5581,7 +5581,7 @@
           let convos = recentConversationsCache;
           if (!convos.length) {
             try {
-              const data = await callApi("/analytics-conversations", {});
+              const data = await callApi("/analytics-conversations", { client_id: currentClientId });
               convos = data.conversations || [];
               recentConversationsCache = convos;
             } catch {
