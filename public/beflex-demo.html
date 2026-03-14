@@ -412,22 +412,7 @@
     <div class="footer-copy">© 2025 BeFlex · Demo by DGC</div>
   </footer>
 
-  <!-- Flex widget config — injects before widget loads so it uses Beflex branding -->
-  <script>
-    window.__ECHO_WIDGET_CONFIG__ = {
-      display_name: "Flex",
-      brand_line: "Workspace Advisor · BeFlex",
-      primary_color: "#5beefa",
-      theme: "dark",
-      greeting: "Hi! I'm Flex, your workspace advisor at BeFlex.\n\nWe help companies find the perfect flexible office space from 50,000+ locations worldwide — completely free.\n\nWhat are you looking for?",
-      starters: [
-        "Find office space for my team",
-        "How does BeFlex work?",
-        "What workspace types do you offer?",
-        "Book a free consultation",
-      ],
-    };
-  </script>
+  <!-- Widget loads config dynamically from Supabase via /widget-config — edit via Vault settings -->
   <script src="/widget.js" data-client-id="beflex"></script>
 
 </body>
