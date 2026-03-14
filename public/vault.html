@@ -5939,15 +5939,21 @@
             sel.appendChild(opt);
           });
           if (clientsIndex.length) {
-            currentClientId = resolveClientUuid(
-              clientsIndex[0].id || clientsIndex[0].slug,
-            );
+            // Default to DGC client; fall back to first in list
+            const dgcDefault = clientsIndex.find(
+              (c) => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc"
+            ) || clientsIndex[0];
+            currentClientId = resolveClientUuid(dgcDefault.id || dgcDefault.slug);
             sel.value = currentClientId;
             // Apply theme for the initially selected client
             try {
               const d = await callApi("/client-settings-get", { client_id: currentClientId });
               applyClientTheme(d.widget_config?.primary_color || "#4a8ac7");
             } catch (_) {}
+            // Show/hide Register New Client based on default selection
+            const isDGC = !!dgcDefault;
+            const regSection = document.getElementById("register-client-section");
+            if (regSection) regSection.style.display = isDGC ? "block" : "none";
           }
         } catch (e) {
           console.warn("Could not load clients:", e.message);
