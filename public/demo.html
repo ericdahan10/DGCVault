@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Chatbot Demo · DGC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Space Grotesk", sans-serif;
+      background: #0a0a0a;
+      color: #e8edf4;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* DGC demo banner */
+    .demo-banner {
+      background: linear-gradient(90deg, #0d1117, #142d5a, #0d1117);
+      border-bottom: 1px solid rgba(74,138,199,0.2);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #7db8e8;
+      font-family: "Inter", sans-serif;
+    }
+    .demo-banner strong { color: #fff; }
+    .demo-banner a {
+      color: #4a8ac7;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid rgba(74,138,199,0.3);
+      padding: 5px 14px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .demo-banner a:hover { background: rgba(74,138,199,0.1); }
+
+    /* Main hero */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px 120px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(74,138,199,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,138,199,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 600px; }
+
+    .client-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent, #4a8ac7);
+      background: rgba(74,138,199,0.08);
+      border: 1px solid rgba(74,138,199,0.2);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      font-family: "Inter", sans-serif;
+    }
+
+    h1 {
+      font-size: clamp(32px, 6vw, 52px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 40%, var(--accent, #4a8ac7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #7a8a9a;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      font-family: "Inter", sans-serif;
+      max-width: 460px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #4a5a6a;
+      font-family: "Inter", sans-serif;
+      justify-content: center;
+    }
+    .cta-hint::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent, #4a8ac7);
+      box-shadow: 0 0 8px var(--accent, #4a8ac7);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Error state */
+    .error-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: #555;
+      font-family: "Inter", sans-serif;
+    }
+    .error-state h2 { color: #888; margin-bottom: 8px; }
+
+    /* DGC footer */
+    .dgc-footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 11px;
+      color: #2a3a4a;
+      font-family: "Inter", sans-serif;
+      border-top: 1px solid #111;
+    }
+    .dgc-footer a { color: #2d5a8f; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- DGC demo banner -->
+  <div class="demo-banner">
+    <span>🤖 <strong>DGC Demo</strong> — AI Chatbot powered by Echo</span>
+    <a href="https://dahangroup.io" target="_blank">Get this for your business →</a>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-content" id="hero-content">
+      <div class="client-badge" id="client-badge">Loading...</div>
+      <h1 id="hero-title">Your AI Assistant</h1>
+      <p class="subtitle" id="hero-subtitle">Ask anything — I'm here to help.</p>
+      <div class="cta-hint">Chat widget is live in the bottom right corner</div>
+    </div>
+  </div>
+
+  <!-- DGC footer -->
+  <div class="dgc-footer">
+    Powered by <a href="https://dahangroup.io" target="_blank">Dahan Group Consulting</a> · AI solutions for growing businesses
+  </div>
+
+  <script>
+    // Read client slug from ?client= URL param
+    const params = new URLSearchParams(window.location.search);
+    const clientSlug = params.get("client") || "dgc";
+
+    const WORKER_URL = "https://dgc-chat-api.ericdahan10.workers.dev";
+
+    // Fetch widget config and apply branding to the page
+    fetch(`${WORKER_URL}/widget-config?client_id=${encodeURIComponent(clientSlug)}`)
+      .then(r => r.json())
+      .then(cfg => {
+        const name = cfg.display_name || clientSlug;
+        const color = cfg.primary_color || "#4a8ac7";
+        const brandLine = cfg.brand_line || "";
+
+        // Apply accent colour to CSS var
+        document.documentElement.style.setProperty("--accent", color);
+
+        // Update page content
+        document.getElementById("client-badge").textContent = brandLine || name;
+        document.getElementById("hero-title").textContent = `Meet your ${name} AI assistant`;
+        document.getElementById("hero-subtitle").textContent =
+          cfg.greeting
+            ? cfg.greeting.split("\n")[0]
+            : `Ask me anything about ${name}.`;
+
+        document.title = `${name} AI Demo · DGC`;
+      })
+      .catch(() => {
+        document.getElementById("client-badge").textContent = "Demo";
+      });
+  </script>
+
+  <!-- Widget loads config from Supabase — no hardcoding needed -->
+  <script id="echo-widget-script" src="/widget.js"></script>
+  <script>
+    // Set client-id dynamically from URL param
+    const widgetScript = document.getElementById("echo-widget-script");
+    widgetScript.setAttribute("data-client-id", clientSlug);
+  </script>
+
+</body>
+</html>

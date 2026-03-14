@@ -3855,18 +3855,18 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
                   <div>
                     <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Client Name</label>
-                    <input id="new-client-name" type="text" placeholder="e.g. BeFlex"
+                    <input id="new-client-name" type="text" placeholder="e.g. Acme Corp"
                       style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:inherit;outline:none;" />
                   </div>
                   <div>
                     <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">Slug</label>
-                    <input id="new-client-slug" type="text" placeholder="e.g. beflex"
+                    <input id="new-client-slug" type="text" placeholder="e.g. acme (lowercase, no spaces)"
                       style="width:100%;padding:9px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:monospace;outline:none;" />
                   </div>
                 </div>
                 <div style="margin-bottom:14px;">
                   <label style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#555;display:block;margin-bottom:5px;">System Prompt</label>
-                  <textarea id="new-client-prompt" rows="7" placeholder="You are an AI assistant for [Client]..."
+                  <textarea id="new-client-prompt" rows="7" placeholder="You are an AI assistant for [Client Name]. Describe who the bot is, what the business does, and how it should respond..."
                     style="width:100%;padding:10px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:12px;color:#ccc;font-family:inherit;outline:none;resize:vertical;line-height:1.6;"></textarea>
                 </div>
                 <div style="display:flex;align-items:center;gap:12px;">
@@ -3876,6 +3876,25 @@
                     Create Client
                   </button>
                   <span id="register-client-feedback" style="font-size:12px;color:#4ade80;display:none;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Delete Client — DGC only ────────────────────────────────────── -->
+            <div id="delete-client-section" style="display:none;margin-bottom:20px;">
+              <div class="card" style="border-color:rgba(239,68,68,0.2);">
+                <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                  <span style="color:#fca5a5;">Delete Client</span>
+                  <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#ef4444;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:3px 9px;border-radius:4px;">DGC Admin</span>
+                </div>
+                <p class="card-desc" style="font-size:12px;color:#555;margin-bottom:16px;">Permanently remove a client and all their data. Select from the client dropdown above first.</p>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <button onclick="deleteCurrentClient()"
+                    style="padding:10px 22px;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
+                    onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
+                    Delete Selected Client
+                  </button>
+                  <span id="delete-client-feedback" style="font-size:12px;display:none;"></span>
                 </div>
               </div>
             </div>
@@ -5906,16 +5925,40 @@
             system_prompt: prompt,
             widget_config: {
               display_name: name,
-              primary_color: "#5beefa",
+              primary_color: "#4a8ac7",
               theme: "dark",
-              brand_line: "Workspace Advisor · BeFlex",
-              greeting: "Hi! I'm Flex, your workspace advisor at BeFlex.\n\nWe help companies find flexible office space from 50,000+ locations worldwide — completely free.\n\nWhat can I help you with?",
-              starters: ["Find office space for my team", "How does BeFlex work?", "What workspace types do you offer?", "Book a free consultation"],
+              greeting: `Hi! I'm the ${name} assistant. How can I help you today?`,
+              starters: ["Tell me more", "How does it work?", "Get in touch"],
             },
           });
-          fb.textContent = "Client registered! Refreshing…"; fb.style.color = "#4ade80";
+          const demoUrl = `https://vault.dahangroup.io/demo.html?client=${encodeURIComponent(slug)}`;
+          fb.innerHTML = `Client registered! <a href="${demoUrl}" target="_blank" style="color:#7db8e8;text-decoration:underline;">Open demo →</a>`;
+          fb.style.color = "#4ade80";
+          document.getElementById("new-client-name").value = "";
+          document.getElementById("new-client-slug").value = "";
+          document.getElementById("new-client-prompt").value = "";
           await loadClients();
-          setTimeout(() => { fb.style.display = "none"; }, 3000);
+          setTimeout(() => { fb.style.display = "none"; }, 8000);
+        } catch (err) {
+          fb.textContent = "Error: " + err.message; fb.style.color = "#ef4444";
+        }
+      }
+
+      async function deleteCurrentClient() {
+        const sel = document.getElementById("client-selector");
+        const clientName = sel.options[sel.selectedIndex]?.textContent || "this client";
+        const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc");
+        if (dgcClient && currentClientId === dgcClient.id) {
+          showToast("Cannot delete the DGC client", "error"); return;
+        }
+        if (!confirm(`Permanently delete "${clientName}"? This cannot be undone.`)) return;
+        const fb = document.getElementById("delete-client-feedback");
+        fb.textContent = "Deleting…"; fb.style.color = "#888"; fb.style.display = "inline";
+        try {
+          await callApi("/client-delete", { client_id: currentClientId });
+          fb.textContent = "Deleted."; fb.style.color = "#4ade80";
+          await loadClients();
+          setTimeout(() => { fb.style.display = "none"; }, 2000);
         } catch (err) {
           fb.textContent = "Error: " + err.message; fb.style.color = "#ef4444";
         }
@@ -5950,10 +5993,12 @@
               const d = await callApi("/client-settings-get", { client_id: currentClientId });
               applyClientTheme(d.widget_config?.primary_color || "#4a8ac7");
             } catch (_) {}
-            // Show/hide Register New Client based on default selection
+            // Show/hide DGC-only sections based on default selection
             const isDGC = !!dgcDefault;
             const regSection = document.getElementById("register-client-section");
             if (regSection) regSection.style.display = isDGC ? "block" : "none";
+            const delSection = document.getElementById("delete-client-section");
+            if (delSection) delSection.style.display = isDGC ? "block" : "none";
           }
         } catch (e) {
           console.warn("Could not load clients:", e.message);
@@ -6003,6 +6048,8 @@
         const isDGC = dgcClient && currentClientId === dgcClient.id;
         const regSection = document.getElementById("register-client-section");
         if (regSection) regSection.style.display = isDGC ? "block" : "none";
+        const delSection = document.getElementById("delete-client-section");
+        if (delSection) delSection.style.display = isDGC ? "block" : "none";
         // Always update theme immediately when switching clients
         try {
           const data = await callApi("/client-settings-get", { client_id: currentClientId });
