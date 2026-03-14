@@ -6096,8 +6096,9 @@
               const d = await callApi("/client-settings-get", { client_id: currentClientId });
               applyClientTheme(d.widget_config?.primary_color || "#4a8ac7");
             } catch (_) {}
-            // Show/hide DGC-only sections based on default selection
-            const isDGC = !!dgcDefault;
+            // Show/hide DGC-only sections — check if current selection is DGC
+            const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc");
+            const isDGC = !!(dgcClient && currentClientId === dgcClient.id);
             const regSection = document.getElementById("register-client-section");
             if (regSection) regSection.style.display = isDGC ? "block" : "none";
             const delSection = document.getElementById("delete-client-section");

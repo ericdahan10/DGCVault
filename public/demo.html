@@ -219,12 +219,15 @@
       });
   </script>
 
-  <!-- Widget loads config from Supabase — no hardcoding needed -->
-  <script id="echo-widget-script" src="/widget.js"></script>
+  <!-- Widget: create script tag with data-client-id set BEFORE it loads,
+       so widget.js reads the correct client on execution -->
   <script>
-    // Set client-id dynamically from URL param
-    const widgetScript = document.getElementById("echo-widget-script");
-    widgetScript.setAttribute("data-client-id", clientSlug);
+    (function() {
+      const s = document.createElement("script");
+      s.src = "/widget.js";
+      s.setAttribute("data-client-id", clientSlug);
+      document.body.appendChild(s);
+    })();
   </script>
 
 </body>
