@@ -6201,7 +6201,15 @@
         // Update the "editing label" so it's always clear which client you're changing
         const client = clientsIndex.find(c => c.id === resolvedClientId || c.slug === resolvedClientId);
         const editLabel = document.getElementById("widget-editing-label");
-        if (editLabel) editLabel.textContent = `Editing: ${client?.name || resolvedClientId}`;
+        if (editLabel) {
+          const clientName = client?.name || resolvedClientId;
+          const isDGCClient = client?.slug?.toLowerCase() === "dgc" || clientName?.toLowerCase() === "dgc";
+          editLabel.textContent = `Editing: ${clientName}`;
+          // Make it visually distinct (orange warning) when editing DGC itself
+          editLabel.style.color = isDGCClient ? "#fb923c" : "#4a8ac7";
+          editLabel.style.background = isDGCClient ? "rgba(251,146,60,0.1)" : "rgba(74,138,199,0.1)";
+          editLabel.style.borderColor = isDGCClient ? "rgba(251,146,60,0.3)" : "rgba(74,138,199,0.2)";
+        }
         try {
           const data = await callApi("/client-settings-get", {
             client_id: resolvedClientId,
