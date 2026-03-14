@@ -6123,6 +6123,8 @@
             if (regSection) regSection.style.display = isDGC ? "block" : "none";
             const delSection = document.getElementById("delete-client-section");
             if (delSection) delSection.style.display = isDGC ? "block" : "none";
+            const trashSection = document.getElementById("deleted-clients-section");
+            if (trashSection) trashSection.style.display = isDGC ? "" : "none";
             renderClientDeleteList();
             if (isDGC) loadDeletedClients();
           }
@@ -6194,6 +6196,8 @@
         if (regSection) regSection.style.display = isDGC ? "block" : "none";
         const delSection = document.getElementById("delete-client-section");
         if (delSection) delSection.style.display = isDGC ? "block" : "none";
+        const trashSection = document.getElementById("deleted-clients-section");
+        if (trashSection) trashSection.style.display = isDGC ? "" : "none";
         if (isDGC) loadDeletedClients();
         // Always update theme immediately when switching clients
         try {
