@@ -3892,6 +3892,17 @@
               </div>
             </div>
 
+            <!-- ── Recently Deleted — DGC only ─────────────────────────────────── -->
+            <div id="deleted-clients-section" style="display:none;margin-bottom:20px;">
+              <div class="card" style="border-color:#1e2a3a;">
+                <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                  <span style="color:#888;">Recently Deleted</span>
+                </div>
+                <p style="font-size:12px;color:#444;margin-bottom:14px;font-family:'Inter',sans-serif;">Restore a client that was accidentally deleted. All their data (leads, tickets, settings) is preserved.</p>
+                <div id="deleted-client-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+              </div>
+            </div>
+
             <!-- Status banner -->
             <div
               id="settings-status-banner"
@@ -5982,15 +5993,64 @@
       }
 
       async function deleteClient(clientId, clientName, btn) {
-        if (!confirm(`Permanently delete "${clientName}"? This cannot be undone.`)) return;
+        if (!confirm(`Delete "${clientName}"? You can restore it from the Recently Deleted section below.`)) return;
         if (btn) { btn.disabled = true; btn.textContent = "Deleting…"; }
         try {
           await callApi("/client-delete", { client_id: clientId });
-          showToast(`"${clientName}" deleted`);
+          showToast(`"${clientName}" deleted — restore it below if needed`);
           await loadClients();
+          await loadDeletedClients();
         } catch (err) {
           showToast("Delete failed: " + err.message, "error");
           if (btn) { btn.disabled = false; btn.textContent = "Delete"; }
+        }
+      }
+
+      async function loadDeletedClients() {
+        const section = document.getElementById("deleted-clients-section");
+        const list = document.getElementById("deleted-client-list");
+        if (!section || !list) return;
+        try {
+          const res = await fetch(`${API_URL}/clients-deleted`, {
+            method: "GET",
+            headers: { "X-API-Key": apiKey },
+          });
+          const data = res.ok ? await res.json() : { clients: [] };
+          const deleted = data.clients || [];
+          section.style.display = deleted.length ? "block" : "none";
+          if (!deleted.length) return;
+          list.innerHTML = deleted.map(c => {
+            const deletedAgo = c.deleted_at
+              ? new Date(c.deleted_at).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+              : "";
+            return `
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#0e1420;border:1px solid #1e2a3a;border-radius:8px;">
+                <div>
+                  <span style="font-size:13px;color:#888;font-family:'Inter',sans-serif;">${c.name || c.slug || c.id}</span>
+                  ${deletedAgo ? `<span style="font-size:11px;color:#333;margin-left:8px;font-family:'Inter',sans-serif;">deleted ${deletedAgo}</span>` : ""}
+                </div>
+                <button onclick="restoreClient('${c.id}','${(c.name||c.slug||'').replace(/'/g,"\\'")}', this)"
+                  style="padding:6px 14px;background:rgba(74,222,128,0.1);color:#4ade80;border:1px solid rgba(74,222,128,0.2);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;"
+                  onmouseover="this.style.opacity=0.75" onmouseout="this.style.opacity=1">
+                  Restore
+                </button>
+              </div>`;
+          }).join("");
+        } catch (e) {
+          section.style.display = "none";
+        }
+      }
+
+      async function restoreClient(clientId, clientName, btn) {
+        if (btn) { btn.disabled = true; btn.textContent = "Restoring…"; }
+        try {
+          await callApi("/client-restore", { client_id: clientId });
+          showToast(`"${clientName}" restored`);
+          await loadClients();
+          await loadDeletedClients();
+        } catch (err) {
+          showToast("Restore failed: " + err.message, "error");
+          if (btn) { btn.disabled = false; btn.textContent = "Restore"; }
         }
       }
 
@@ -6030,6 +6090,7 @@
             const delSection = document.getElementById("delete-client-section");
             if (delSection) delSection.style.display = isDGC ? "block" : "none";
             renderClientDeleteList();
+            if (isDGC) loadDeletedClients();
           }
         } catch (e) {
           console.warn("Could not load clients:", e.message);
@@ -6098,6 +6159,7 @@
         if (regSection) regSection.style.display = isDGC ? "block" : "none";
         const delSection = document.getElementById("delete-client-section");
         if (delSection) delSection.style.display = isDGC ? "block" : "none";
+        if (isDGC) loadDeletedClients();
         // Always update theme immediately when switching clients
         try {
           const data = await callApi("/client-settings-get", { client_id: currentClientId });
