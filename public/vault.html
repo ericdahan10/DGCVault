@@ -4096,6 +4096,26 @@
               </div>
             </div>
 
+            <!-- Demo page link card -->
+            <div class="card" style="margin-top: 20px; border-color: rgba(74,138,199,0.2); background: linear-gradient(150deg, #0d1420 0%, #111 100%);">
+              <div class="card-title">Demo Page</div>
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div style="font-size:13px; color:#6a8aaa; font-family:'Inter',sans-serif; flex:1; min-width:200px;">
+                  Share this link with your client to demo their chatbot — branding is pulled live from Widget Appearance settings above.
+                </div>
+                <a id="client-demo-link" href="#" target="_blank"
+                  style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:rgba(74,138,199,0.12);border:1px solid rgba(74,138,199,0.3);border-radius:8px;color:#7db8e8;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;font-family:'Inter',sans-serif;transition:background 0.15s;"
+                  onmouseover="this.style.background='rgba(74,138,199,0.22)'" onmouseout="this.style.background='rgba(74,138,199,0.12)'">
+                  ↗ Open demo
+                </a>
+                <button onclick="copyDemoLink()"
+                  style="padding:9px 14px;background:transparent;border:1px solid #2a3a4a;border-radius:8px;color:#555;font-size:12px;cursor:pointer;font-family:inherit;transition:color 0.15s;"
+                  onmouseover="this.style.color='#7db8e8'" onmouseout="this.style.color='#555'">
+                  Copy link
+                </button>
+              </div>
+            </div>
+
             <!-- Widget Config card -->
             <div class="card" style="margin-top: 20px">
               <div class="card-title">Widget Appearance</div>
@@ -6005,6 +6025,22 @@
         }
       }
 
+      // ── Demo page link ──────────────────────────────────────────────────────────
+      function updateDemoLink() {
+        const client = clientsIndex.find(c => (c.id || c.slug) === currentClientId || c.id === currentClientId);
+        const slug = client?.slug || client?.name?.toLowerCase().replace(/\s+/g, "-") || currentClientId;
+        const url = `https://vault.dahangroup.io/demo.html?client=${encodeURIComponent(slug)}`;
+        const link = document.getElementById("client-demo-link");
+        if (link) { link.href = url; link.dataset.url = url; }
+      }
+
+      function copyDemoLink() {
+        const link = document.getElementById("client-demo-link");
+        const url = link?.dataset.url || link?.href;
+        if (!url) return;
+        navigator.clipboard.writeText(url).then(() => showToast("Demo link copied"));
+      }
+
       // ── Client theming ──────────────────────────────────────────────────────────
       // Computes lighter/darker variants from a hex color and injects CSS overrides
       function applyClientTheme(primaryHex) {
@@ -6043,6 +6079,7 @@
       // Called when the client selector changes — reload all data for the new client
       async function switchClient(clientId) {
         currentClientId = resolveClientUuid(clientId) || clientId;
+        updateDemoLink();
         // Show "Register New Client" only when the DGC client is selected
         const dgcClient = clientsIndex.find(c => (c.slug || "").toLowerCase() === "dgc" || (c.name || "").toLowerCase() === "dgc");
         const isDGC = dgcClient && currentClientId === dgcClient.id;
@@ -6238,6 +6275,7 @@
       }
 
       async function loadSettings() {
+        updateDemoLink();
         const textarea = document.getElementById("settings-prompt");
         const charCount = document.getElementById("settings-char-count");
         const customBadge = document.getElementById("settings-custom-badge");
