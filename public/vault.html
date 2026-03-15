@@ -5570,6 +5570,7 @@
             <button class="lead-btn lead-btn-crm${l.crm_pushed ? " pushed" : ""}"
               onclick="pushLeadToCrm('${l.id}', ${i})"
               ${l.crm_pushed ? "disabled" : ""}>⬆ CRM</button>
+            ${l.conversation_id ? `<button class="lead-btn" style="background:rgba(74,138,199,0.1);border-color:rgba(74,138,199,0.25);color:#7db8e8;" onclick="openConvoDrawer('${l.conversation_id}','${escapeHtml(l.visitor_name || "Unknown")}',0)">💬 Chat</button>` : ""}
             <button class="lead-btn lead-btn-export"
               onclick="exportLeads([allLeads[${allLeads.indexOf(l)}]], '${(l.visitor_name || "lead").replace(/[^a-z0-9]/gi, "-").toLowerCase()}')">⬇</button>
           </div>
