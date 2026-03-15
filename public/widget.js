@@ -829,7 +829,7 @@
             }),
           });
         } catch (e) {
-          /* best effort */
+          console.error("[ECHO] Lead capture failed:", e.message);
         }
       };
     }
@@ -900,7 +900,7 @@
             }),
           });
         } catch (e) {
-          /* best effort */
+          console.error("[ECHO] Ticket submission failed:", e.message);
         }
       };
     }
