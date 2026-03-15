@@ -3812,35 +3812,22 @@
               </button>
             </div>
 
-            <div class="ticket-filter-bar" style="margin-top: 20px">
-              <button
-                class="ticket-filter-btn active"
-                id="lf-all"
-                onclick="filterLeads('all')"
-              >
-                All
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="lf-HOT"
-                onclick="filterLeads('HOT')"
-              >
-                HOT
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="lf-WARM"
-                onclick="filterLeads('WARM')"
-              >
-                WARM
-              </button>
-              <button
-                class="ticket-filter-btn"
-                id="lf-COLD"
-                onclick="filterLeads('COLD')"
-              >
-                COLD
-              </button>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap;">
+              <div class="ticket-filter-bar" style="margin-top:0">
+                <button class="ticket-filter-btn active" id="lf-all" onclick="filterLeads('all')">All</button>
+                <button class="ticket-filter-btn" id="lf-HOT" onclick="filterLeads('HOT')">HOT</button>
+                <button class="ticket-filter-btn" id="lf-WARM" onclick="filterLeads('WARM')">WARM</button>
+                <button class="ticket-filter-btn" id="lf-COLD" onclick="filterLeads('COLD')">COLD</button>
+              </div>
+              <input
+                id="leads-search"
+                type="text"
+                placeholder="Search name or email…"
+                oninput="renderLeads()"
+                style="flex:1;min-width:180px;max-width:280px;padding:7px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:'Space Grotesk',sans-serif;outline:none;"
+                onfocus="this.style.borderColor='#4a8ac7'"
+                onblur="this.style.borderColor='#2a3a4a'"
+              />
             </div>
 
             <div id="leads-container">
@@ -5462,7 +5449,11 @@
           '<div class="leads-empty">Loading leads...</div>';
         try {
           const data = await callApi("/leads", { client_id: currentClientId });
-          allLeads = data.leads || [];
+          // Sort newest first
+          allLeads = (data.leads || []).sort((a, b) =>
+            new Date(b.created_at || 0) - new Date(a.created_at || 0)
+          );
+          updateLeadFilterCounts();
           renderLeads();
         } catch (e) {
           document.getElementById("leads-container").innerHTML =
@@ -5470,11 +5461,34 @@
         }
       }
 
+      function updateLeadFilterCounts() {
+        const counts = { HOT: 0, WARM: 0, COLD: 0 };
+        allLeads.forEach((l) => {
+          const s = (l.score_label || "").toUpperCase();
+          if (counts[s] !== undefined) counts[s]++;
+        });
+        const btn = (id, label, count) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = count ? `${label} (${count})` : label;
+        };
+        btn("lf-all",  "All",  allLeads.length);
+        btn("lf-HOT",  "HOT",  counts.HOT);
+        btn("lf-WARM", "WARM", counts.WARM);
+        btn("lf-COLD", "COLD", counts.COLD);
+      }
+
       function getFilteredLeads() {
-        if (activeLeadFilter === "all") return allLeads;
-        return allLeads.filter(
-          (l) => (l.score_label || "").toUpperCase() === activeLeadFilter,
-        );
+        const query = (document.getElementById("leads-search")?.value || "").trim().toLowerCase();
+        let leads = activeLeadFilter === "all"
+          ? allLeads
+          : allLeads.filter((l) => (l.score_label || "").toUpperCase() === activeLeadFilter);
+        if (query) {
+          leads = leads.filter((l) =>
+            (l.visitor_name || "").toLowerCase().includes(query) ||
+            (l.visitor_email || "").toLowerCase().includes(query)
+          );
+        }
+        return leads;
       }
 
       function filterLeads(filter) {
