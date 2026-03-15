@@ -2101,6 +2101,59 @@
         cursor: default;
       }
 
+      .ticket-bottom-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .ticket-notes-wrap {
+        flex: 1;
+        min-width: 160px;
+      }
+      .ticket-notes-input {
+        width: 100%;
+        background: #0e1420;
+        border: 1px solid #2a3d5c;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        font-family: "Inter", sans-serif;
+        color: #ccc;
+        resize: none;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.15s;
+      }
+      .ticket-notes-input:focus { border-color: #4a8ac7; }
+      .ticket-notes-input::placeholder { color: #444; }
+      .ticket-assignee-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      .ticket-assignee-label {
+        font-size: 11px;
+        color: #555;
+        font-family: "Inter", sans-serif;
+      }
+      .ticket-assignee-input {
+        background: #0e1420;
+        border: 1px solid #2a3d5c;
+        border-radius: 6px;
+        padding: 5px 9px;
+        font-size: 12px;
+        font-family: "Inter", sans-serif;
+        color: #ccc;
+        outline: none;
+        width: 130px;
+        transition: border-color 0.15s;
+      }
+      .ticket-assignee-input:focus { border-color: #4a8ac7; }
+      .ticket-assignee-input::placeholder { color: #444; }
+
       .tickets-empty {
         text-align: center;
         padding: 60px 20px;
@@ -2399,6 +2452,17 @@
           justify-content: center;
           font-size: 11px;
           padding: 7px 10px;
+        }
+        .ticket-bottom-row {
+          flex-direction: column;
+          gap: 8px;
+        }
+        .ticket-assignee-wrap {
+          width: 100%;
+        }
+        .ticket-assignee-input {
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .convo-row {
@@ -3862,12 +3926,23 @@
               </button>
             </div>
 
-            <!-- Status filter bar -->
-            <div class="ticket-filter-bar">
-              <button class="ticket-filter-btn active" id="tf-all" onclick="filterTickets('all')">All</button>
-              <button class="ticket-filter-btn" id="tf-open" onclick="filterTickets('open')">Open</button>
-              <button class="ticket-filter-btn" id="tf-in_progress" onclick="filterTickets('in_progress')">In Progress</button>
-              <button class="ticket-filter-btn" id="tf-resolved" onclick="filterTickets('resolved')">Resolved</button>
+            <!-- Status filter bar + search -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+              <div class="ticket-filter-bar" style="margin-bottom:0;flex-wrap:wrap;">
+                <button class="ticket-filter-btn active" id="tf-all" onclick="filterTickets('all')">All</button>
+                <button class="ticket-filter-btn" id="tf-open" onclick="filterTickets('open')">Open</button>
+                <button class="ticket-filter-btn" id="tf-in_progress" onclick="filterTickets('in_progress')">In Progress</button>
+                <button class="ticket-filter-btn" id="tf-resolved" onclick="filterTickets('resolved')">Resolved</button>
+              </div>
+              <input
+                id="tickets-search"
+                type="text"
+                placeholder="Search name, email or issue…"
+                oninput="renderTickets()"
+                style="flex:1;min-width:180px;max-width:280px;padding:7px 12px;background:#0e1420;border:1px solid #2a3a4a;border-radius:8px;font-size:13px;color:#e2e8f0;font-family:'Space Grotesk',sans-serif;outline:none;"
+                onfocus="this.style.borderColor='#4a8ac7'"
+                onblur="this.style.borderColor='#2a3a4a'"
+              />
             </div>
 
             <!-- Urgency filter bar -->
@@ -5689,18 +5764,34 @@
       let allTickets = []; // full list from server
       let activeTicketFilter = "all";
       let activeUrgencyFilter = "all";
+      let ticketSearchQuery = "";
 
       async function loadTickets() {
         document.getElementById("tickets-container").innerHTML =
           "<div style=\"font-size:13px;color:#555;font-family:'Inter',sans-serif;padding:8px 0\">Loading tickets...</div>";
         try {
           const data = await callApi("/tickets", { client_id: currentClientId });
-          allTickets = data.tickets || [];
+          allTickets = (data.tickets || []).sort((a, b) =>
+            new Date(b.created_at || 0) - new Date(a.created_at || 0)
+          );
+          updateTicketFilterCounts();
           renderTickets();
         } catch (e) {
           document.getElementById("tickets-container").innerHTML =
             `<div style="font-size:13px;color:#ef4444;font-family:'Inter',sans-serif;padding:8px 0">Error loading tickets: ${e.message}</div>`;
         }
+      }
+
+      function updateTicketFilterCounts() {
+        const counts = { all: allTickets.length, open: 0, in_progress: 0, resolved: 0 };
+        allTickets.forEach((t) => {
+          const s = t.status || "open";
+          if (counts[s] !== undefined) counts[s]++;
+        });
+        document.getElementById("tf-all").textContent = `All (${counts.all})`;
+        document.getElementById("tf-open").textContent = `Open (${counts.open})`;
+        document.getElementById("tf-in_progress").textContent = `In Progress (${counts.in_progress})`;
+        document.getElementById("tf-resolved").textContent = `Resolved (${counts.resolved})`;
       }
 
       function filterTickets(status) {
@@ -5819,9 +5910,19 @@
       }
 
       function getFilteredTickets() {
+        const query = (document.getElementById("tickets-search")?.value || "").trim().toLowerCase();
         return allTickets
           .filter((t) => activeTicketFilter === "all" || t.status === activeTicketFilter)
-          .filter((t) => activeUrgencyFilter === "all" || (t.urgency || "medium").toLowerCase() === activeUrgencyFilter);
+          .filter((t) => activeUrgencyFilter === "all" || (t.urgency || "medium").toLowerCase() === activeUrgencyFilter)
+          .filter((t) => {
+            if (!query) return true;
+            return (
+              (t.visitor_name || "").toLowerCase().includes(query) ||
+              (t.visitor_email || "").toLowerCase().includes(query) ||
+              (t.description || t.subject || "").toLowerCase().includes(query) ||
+              (t.ticket_number || "").toLowerCase().includes(query)
+            );
+          });
       }
 
       function renderTickets() {
@@ -5848,9 +5949,10 @@
             const status = t.status || "open";
             const submittedAt = formatTicketSubmittedAt(t.created_at);
             const ticketNum = t.ticket_number || "N/A";
-            const desc =
-              t.description || t.subject || "No description provided.";
+            const desc = t.description || t.subject || "No description provided.";
             const crmPushed = t.crm_pushed;
+            const notesVal = escapeHtml(t.notes || "");
+            const assigneeVal = escapeHtml(t.assignee || "");
             const emailHref = t.visitor_email
               ? `mailto:${encodeURIComponent(t.visitor_email)}?subject=${encodeURIComponent("Re: Support Ticket " + ticketNum)}&body=${encodeURIComponent("Hi " + (t.visitor_name || "there") + ",\n\nThank you for reaching out.\n\n")}`
               : null;
@@ -5862,6 +5964,7 @@
               <span class="ticket-id">${escapeHtml(ticketNum)}</span>
               <span class="ticket-urgency-badge ${urgency}">${urgency}</span>
               ${crmPushed ? '<span class="ticket-crm-pushed">✓ In CRM</span>' : ""}
+              ${assigneeVal ? `<span style="font-size:10px;color:#7db8e8;font-family:'Inter',sans-serif;">👤 ${assigneeVal}</span>` : ""}
             </div>
             <div class="ticket-issue">${escapeHtml(desc)}</div>
             <div class="ticket-visitor">
@@ -5870,6 +5973,26 @@
               ${t.visitor_phone ? `<span class="ticket-visitor-name">${escapeHtml(t.visitor_phone)}</span>` : ""}
             </div>
             <div class="ticket-date">${submittedAt}</div>
+            <div class="ticket-bottom-row" onclick="event.stopPropagation()">
+              <div class="ticket-notes-wrap">
+                <textarea
+                  class="ticket-notes-input"
+                  rows="2"
+                  placeholder="Internal notes…"
+                  onblur="saveTicketNotes('${escapeHtml(ticketNum)}', this.value, ${i})"
+                >${notesVal}</textarea>
+              </div>
+              <div class="ticket-assignee-wrap">
+                <span class="ticket-assignee-label">Assign:</span>
+                <input
+                  class="ticket-assignee-input"
+                  type="text"
+                  placeholder="Name…"
+                  value="${assigneeVal}"
+                  onblur="saveTicketAssignee('${escapeHtml(ticketNum)}', this.value, ${i})"
+                />
+              </div>
+            </div>
           </div>
           <div class="ticket-actions">
             <select class="ticket-status-select" onclick="event.stopPropagation()" onchange="updateTicketStatus('${escapeHtml(ticketNum)}', this.value, ${i})">
@@ -5901,20 +6024,55 @@
             ticket_number: ticketNum,
             status: newStatus,
           });
-          // Update local state so the dropdown reflects immediately
           const ticket = allTickets.find((t) => t.ticket_number === ticketNum);
           if (ticket) ticket.status = newStatus;
+          updateTicketFilterCounts();
           showToast(`Ticket status updated to ${newStatus.replace("_", " ")}`);
         } catch (e) {
           showToast("Failed to update status: " + e.message, "error");
         }
       }
 
+      async function saveTicketNotes(ticketNum, notes, idx) {
+        try {
+          await callApi("/tickets-update", { ticket_number: ticketNum, notes });
+          const ticket = allTickets.find((t) => t.ticket_number === ticketNum);
+          if (ticket) ticket.notes = notes;
+        } catch (e) {
+          showToast("Failed to save notes: " + e.message, "error");
+        }
+      }
+
+      async function saveTicketAssignee(ticketNum, assignee, idx) {
+        try {
+          await callApi("/tickets-update", { ticket_number: ticketNum, assignee });
+          const ticket = allTickets.find((t) => t.ticket_number === ticketNum);
+          if (ticket) {
+            ticket.assignee = assignee;
+            // Refresh just the assignee badge in the header without full re-render
+            const badge = document.querySelector(`#ticket-card-${idx} .ticket-top span[style*="7db8e8"]`);
+            if (assignee) {
+              if (badge) { badge.textContent = `👤 ${assignee}`; }
+              else {
+                const top = document.querySelector(`#ticket-card-${idx} .ticket-top`);
+                if (top) {
+                  const s = document.createElement("span");
+                  s.style.cssText = "font-size:10px;color:#7db8e8;font-family:'Inter',sans-serif;";
+                  s.textContent = `👤 ${assignee}`;
+                  top.appendChild(s);
+                }
+              }
+            } else if (badge) {
+              badge.remove();
+            }
+          }
+        } catch (e) {
+          showToast("Failed to save assignee: " + e.message, "error");
+        }
+      }
+
       async function pushTicketToCrm(idx) {
-        const filtered =
-          activeTicketFilter === "all"
-            ? allTickets
-            : allTickets.filter((t) => t.status === activeTicketFilter);
+        const filtered = getFilteredTickets();
         const ticket = filtered[idx];
         if (!ticket) return;
 
