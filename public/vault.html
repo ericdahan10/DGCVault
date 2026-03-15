@@ -1479,6 +1479,84 @@
         cursor: not-allowed;
       }
 
+      /* ── Source tags ─────────────────────────────────────────────────────── */
+      .source-tags-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 5px;
+        margin: 8px 0 4px;
+        min-height: 24px;
+      }
+      .source-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(74, 138, 199, 0.1);
+        border: 1px solid rgba(74, 138, 199, 0.2);
+        color: #7db8e8;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .source-tag-remove {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #4a8ac7;
+        font-size: 12px;
+        line-height: 1;
+        padding: 0;
+        opacity: 0.6;
+      }
+      .source-tag-remove:hover { opacity: 1; }
+      .source-tag-add {
+        background: none;
+        border: 1px dashed #2a3a4a;
+        cursor: pointer;
+        color: #3a6a9f;
+        font-size: 10px;
+        font-weight: 600;
+        font-family: "Space Grotesk", sans-serif;
+        padding: 2px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.05em;
+        transition: all 0.15s;
+      }
+      .source-tag-add:hover { border-color: #4a8ac7; color: #4a8ac7; }
+      .source-tag-input-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .source-tag-input {
+        background: #0e1420;
+        border: 1px solid #2a3a4a;
+        border-radius: 4px;
+        color: #e2e8f0;
+        font-size: 11px;
+        font-family: "Space Grotesk", sans-serif;
+        padding: 2px 7px;
+        outline: none;
+        width: 90px;
+      }
+      .source-tag-input:focus { border-color: #4a8ac7; }
+      .source-tag-confirm {
+        background: #4a8ac7;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        font-family: "Space Grotesk", sans-serif;
+        padding: 3px 8px;
+        cursor: pointer;
+      }
+
       .source-context-display {
         font-size: 12px;
         color: #7a9ab8;
@@ -4847,6 +4925,20 @@
         }
       }
 
+      function timeAgo(isoString) {
+        if (!isoString) return null;
+        const diff = Date.now() - new Date(isoString).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 2) return "just now";
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        const days = Math.floor(hrs / 24);
+        if (days < 30) return `${days}d ago`;
+        const months = Math.floor(days / 30);
+        return `${months}mo ago`;
+      }
+
       function renderSources(sources) {
         sourcesData = sources;
         const container = document.getElementById("sources-grid-container");
@@ -4860,17 +4952,31 @@
         }
         container.innerHTML = `<div class="sources-grid">${sources
           .map(
-            (s, i) => `
+            (s, i) => {
+              const ago = timeAgo(s.last_ingested);
+              const tags = s.tags || [];
+              return `
       <div class="source-card" id="src-card-${i}">
         <div class="source-card-header">
           <div class="source-card-info">
             <div class="source-card-icon">${sourceIcon(s.source)}</div>
             <div>
               <div class="source-card-name" title="${escapeHtml(s.source)}">${escapeHtml(s.source || "manual")}</div>
-              <div class="source-card-meta">${s.count} chunk${s.count !== 1 ? "s" : ""}</div>
+              <div class="source-card-meta">${s.count} chunk${s.count !== 1 ? "s" : ""}${ago ? ` · <span title="${escapeHtml(s.last_ingested)}">ingested ${ago}</span>` : ""}</div>
             </div>
           </div>
           <button class="btn-delete" id="src-delbtn-${i}" onclick="confirmDelete(${i})">Delete</button>
+        </div>
+
+        <!-- Tags -->
+        <div class="source-tags-row" id="src-tags-row-${i}">
+          ${tags.map((t, ti) => `<span class="source-tag">${escapeHtml(t)}<button class="source-tag-remove" onclick="removeTag(${i},${ti})" title="Remove tag">×</button></span>`).join("")}
+          <button class="source-tag-add" onclick="toggleTagInput(${i})">+ tag</button>
+          <span class="source-tag-input-wrap" id="src-tag-input-wrap-${i}" style="display:none">
+            <input class="source-tag-input" id="src-tag-input-${i}" placeholder="tag name" maxlength="24"
+              onkeydown="if(event.key==='Enter'){addTag(${i});} if(event.key==='Escape'){toggleTagInput(${i});}"/>
+            <button class="source-tag-confirm" onclick="addTag(${i})">Add</button>
+          </span>
         </div>
 
         ${
@@ -4897,9 +5003,47 @@
             <button class="btn-confirm-delete" id="src-confirmbtn-${i}" onclick="executeDelete(${i})">Yes, delete</button>
           </div>
         </div>
-      </div>`,
+      </div>`;
+            }
           )
           .join("")}</div>`;
+      }
+
+      function toggleTagInput(i) {
+        const wrap = document.getElementById(`src-tag-input-wrap-${i}`);
+        const isVisible = wrap.style.display !== "none";
+        wrap.style.display = isVisible ? "none" : "inline-flex";
+        if (!isVisible) document.getElementById(`src-tag-input-${i}`).focus();
+      }
+
+      async function addTag(i) {
+        const input = document.getElementById(`src-tag-input-${i}`);
+        const val = input.value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, "");
+        if (!val) return;
+        const tags = [...(sourcesData[i].tags || [])];
+        if (tags.includes(val)) { input.value = ""; return; }
+        tags.push(val);
+        sourcesData[i].tags = tags;
+        input.value = "";
+        toggleTagInput(i);
+        await saveTags(i, tags);
+        renderSources(sourcesData);
+      }
+
+      async function removeTag(i, ti) {
+        const tags = [...(sourcesData[i].tags || [])];
+        tags.splice(ti, 1);
+        sourcesData[i].tags = tags;
+        await saveTags(i, tags);
+        renderSources(sourcesData);
+      }
+
+      async function saveTags(i, tags) {
+        try {
+          await callApi("/source-tags-update", { source: sourcesData[i].source, tags });
+        } catch (e) {
+          showToast("Failed to save tags: " + e.message, "error");
+        }
       }
 
       function confirmDelete(i) {
