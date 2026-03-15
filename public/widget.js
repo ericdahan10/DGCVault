@@ -1028,9 +1028,9 @@
     } catch (err) {
       console.warn("[ECHO widget] Could not load config, using defaults.", err);
       const defaults = {
-        display_name: "ECHO",
+        display_name: "AI Assistant",
         brand_line: "AI Assistant",
-        greeting: "Hi! I'm ECHO. How can I help you today?",
+        greeting: "Hi! How can I help you today?",
         primary_color: "#2d5a8f",
         theme: "light",
         api_key: "",
