@@ -809,27 +809,37 @@
           return;
         }
 
-        clearActiveFormMessage();
-        addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, "bot");
+        const cfSubmitBtn = formMsg.querySelector("#echo-cf-submit");
+        cfSubmitBtn.disabled = true;
+        cfSubmitBtn.textContent = "Submitting…";
 
-        try {
-          await fetch(`${workerUrl}/lead-capture`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-API-Key": apiKey,
-            },
-            body: JSON.stringify({
-              name,
-              email,
-              phone,
-              client_id: apiClientId,
-              visitor_id: visitorId,
-              source: "chat_widget",
-            }),
-          });
-        } catch (e) {
-          console.error("[ECHO] Lead capture failed:", e.message);
+        const leadPayload = JSON.stringify({
+          name, email, phone,
+          client_id: apiClientId,
+          visitor_id: visitorId,
+          source: "chat_widget",
+        });
+
+        let saved = false;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const leadRes = await fetch(`${workerUrl}/lead-capture`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "X-API-Key": apiKey },
+              body: leadPayload,
+            });
+            if (leadRes.ok) { saved = true; break; }
+          } catch (e) {
+            console.error("[ECHO] Lead capture attempt", attempt + 1, "failed:", e.message);
+          }
+        }
+
+        clearActiveFormMessage();
+        if (saved) {
+          addMsg(`Thanks ${name}! We'll be in touch at ${email} shortly.`, "bot");
+        } else {
+          addMsg(`Thanks ${name}! We've noted your details and will be in touch at ${email}.`, "bot");
+          console.error("[ECHO] Lead capture failed after 2 attempts.");
         }
       };
     }
@@ -873,15 +883,12 @@
           return;
         }
 
-        ticketSubmitted = true;
-        clearActiveFormMessage();
-        addMsg(
-          `Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`,
-          "bot",
-        );
+        const submitBtn = formMsg.querySelector("#echo-ef-submit");
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting…";
 
         try {
-          await fetch(`${workerUrl}/escalation`, {
+          const ticketRes = await fetch(`${workerUrl}/escalation`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -899,16 +906,31 @@
               category: ticketData.category || "escalation",
             }),
           });
+          if (!ticketRes.ok) throw new Error("Ticket API error");
+          ticketSubmitted = true;
+          clearActiveFormMessage();
+          addMsg(
+            `Got it ${name}! We've created a support ticket and you'll hear from us at ${email} soon.`,
+            "bot",
+          );
         } catch (e) {
           console.error("[ECHO] Ticket submission failed:", e.message);
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit ticket →";
+          addMsg("Something went wrong submitting your ticket. Please try again.", "bot");
         }
       };
     }
 
     // ── Core send ──
 
+    let isSending = false;
+
     async function sendMessage(text) {
-      if (!text.trim()) return;
+      if (!text.trim() || isSending) return;
+      isSending = true;
+      sendBtn.disabled = true;
+
       clearQuickReplies();
       clearActiveFormMessage();
 
@@ -917,6 +939,9 @@
       inputEl.value = "";
 
       addTyping();
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
 
       try {
         const res = await fetch(workerUrl, {
@@ -930,8 +955,10 @@
             visitor_id: visitorId,
             client_id: apiClientId,
           }),
+          signal: controller.signal,
         });
 
+        clearTimeout(timeout);
         removeTyping();
 
         if (!res.ok) throw new Error("Worker error");
@@ -958,11 +985,15 @@
           ]);
         }
       } catch (err) {
+        clearTimeout(timeout);
         removeTyping();
-        addMsg(
-          "Sorry, I couldn't connect. Please try again in a moment.",
-          "bot",
-        );
+        const msg = err.name === "AbortError"
+          ? "Response took too long. Please try again."
+          : "Sorry, I couldn't connect. Please try again in a moment.";
+        addMsg(msg, "bot");
+      } finally {
+        isSending = false;
+        sendBtn.disabled = false;
       }
     }
 
