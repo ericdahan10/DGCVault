@@ -725,13 +725,13 @@
       options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "echo-qr-btn";
-        const cleanOpt = String(opt || "")
-          .replace(/\s+/g, " ")
-          .trim();
-        btn.textContent = cleanOpt;
+        // Support both plain strings and {label, message} objects
+        const label = String((opt && opt.label) || opt || "").replace(/\s+/g, " ").trim();
+        const message = String((opt && opt.message) || opt || "").replace(/\s+/g, " ").trim();
+        btn.textContent = label;
         btn.onclick = () => {
           clearQuickReplies();
-          sendMessage(cleanOpt);
+          sendMessage(message);
         };
         row.appendChild(btn);
       });
