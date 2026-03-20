@@ -423,6 +423,13 @@
         border-radius: 2px;
         background: linear-gradient(90deg, ${primary}cc, ${primary}55);
       }
+      .echo-form-subtitle {
+        margin: -6px 0 12px;
+        font-size: 12px;
+        text-align: center;
+        color: ${isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)"};
+        line-height: 1.5;
+      }
       .echo-inline-form label {
         display: block;
         font-size: 10.5px;
@@ -782,18 +789,25 @@
 
     // ── Forms ──
 
-    function showContactForm(criteriaOverride) {
+    function showContactForm(criteriaOverride, opts) {
+      const title = (opts && opts.title) || "Get in Touch";
+      const subtitle = (opts && opts.subtitle) || "";
+      const phoneRequired = !!(opts && opts.phoneRequired);
+      const phoneLabel = phoneRequired ? "Phone" : "Phone (optional)";
+      const phonePlaceholder = phoneRequired ? "Your phone number" : "Phone (optional)";
+
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-form-shell">
-          <p class="echo-form-title">Get in Touch</p>
+          <p class="echo-form-title">${title}</p>
+          ${subtitle ? `<p class="echo-form-subtitle">${subtitle}</p>` : ""}
           <div class="echo-inline-form">
             <label>Name</label>
             <input id="echo-cf-name" type="text" placeholder="Your name" />
             <label>Email</label>
             <input id="echo-cf-email" type="email" placeholder="you@email.com" />
-            <label>Phone (optional)</label>
-            <input id="echo-cf-phone" type="tel" placeholder="Phone (optional)" />
+            <label>${phoneLabel}</label>
+            <input id="echo-cf-phone" type="tel" placeholder="${phonePlaceholder}" />
             <div class="echo-form-actions">
               <button class="echo-btn-primary" id="echo-cf-submit">Send →</button>
               <button class="echo-btn-secondary" id="echo-cf-cancel">Cancel</button>
@@ -803,6 +817,7 @@
 
       formMsg.querySelector("#echo-cf-cancel").onclick = () => {
         clearActiveFormMessage();
+        if (opts && opts.onCancel) opts.onCancel();
       };
 
       const contactNameInput = formMsg.querySelector("#echo-cf-name");
@@ -812,9 +827,11 @@
         const name = formMsg.querySelector("#echo-cf-name").value.trim();
         const email = formMsg.querySelector("#echo-cf-email").value.trim();
         const phone = formMsg.querySelector("#echo-cf-phone").value.trim();
-        if (!name || !email) {
+        if (!name || !email || (phoneRequired && !phone)) {
           addMsg(
-            "Please enter both your name and email so I can submit this.",
+            phoneRequired
+              ? "Please enter your name, email and phone number."
+              : "Please enter both your name and email so I can submit this.",
             "bot",
           );
           return;
