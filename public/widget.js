@@ -741,13 +741,41 @@
 
     function showStarters() {
       showQuickReplies(
-        cfg.starters || [
-          "📅 Book a consultation",
-          "⚡ Automate a process",
-          "🤖 What services do you offer?",
-          "💰 How much does it cost?",
-        ],
+        (window.__ECHO_WIDGET_STARTERS__ && window.__ECHO_WIDGET_STARTERS__.length)
+          ? window.__ECHO_WIDGET_STARTERS__
+          : cfg.starters || [
+            "📅 Book a consultation",
+            "⚡ Automate a process",
+            "🤖 What services do you offer?",
+            "💰 How much does it cost?",
+          ],
       );
+    }
+
+    // ── Criteria extractor — parses chatHistory for location/budget/amenities ──
+    function extractCriteria(history) {
+      var criteria = {};
+      var knownCities = ["London", "Manchester", "Bristol", "Leeds", "Birmingham", "Edinburgh"];
+      var knownAmenities = ["WiFi", "24/7 Access", "Gym", "Shower", "Cafe", "Meeting Rooms", "Bike Storage", "Reception", "Event Space", "Cleaning"];
+      var allText = history.map(function (m) { return m.content; }).join(" ");
+
+      for (var i = 0; i < knownCities.length; i++) {
+        if (allText.toLowerCase().includes(knownCities[i].toLowerCase())) {
+          criteria.city = knownCities[i];
+          break;
+        }
+      }
+
+      var budgetMatch = allText.match(/£\s*(\d[\d,]*)/) || allText.match(/(\d[\d,]+)\s*(?:per\s+desk|\/\s*desk|pcm|per\s+month)/i);
+      if (budgetMatch) {
+        criteria.maxBudget = parseInt(budgetMatch[1].replace(/,/g, ""), 10);
+      }
+
+      criteria.amenities = knownAmenities.filter(function (a) {
+        return allText.toLowerCase().includes(a.toLowerCase());
+      });
+
+      return criteria;
     }
 
     function clearActiveFormMessage() {
@@ -842,8 +870,9 @@
           console.error("[ECHO] Lead capture failed after 2 attempts.");
         }
         // Fire event so the host page can react (e.g. show a results panel)
+        // Include criteria extracted from the conversation for pre-filtering results
         document.dispatchEvent(new CustomEvent("beflex:lead_captured", {
-          detail: { name, email, phone, client_id: apiClientId }
+          detail: { name, email, phone, client_id: apiClientId, criteria: extractCriteria(chatHistory) }
         }));
       };
     }
@@ -1023,6 +1052,9 @@
       widget.setAttribute("aria-hidden", "true");
       launcher.setAttribute("aria-expanded", "false");
     }
+
+    // ── Expose open() so host pages can programmatically open the chat ──
+    window.__ECHO_WIDGET_OPEN__ = open;
 
     // ── Event listeners ──
 

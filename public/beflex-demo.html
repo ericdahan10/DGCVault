@@ -513,7 +513,7 @@
       Get matched to an office that suits your criteria, backed by our tech and data.
     </p>
     <div class="hero-actions">
-      <button onclick="window.brpOpen({name:'',email:'',phone:''})" class="btn-cyan" style="border:none;cursor:pointer;font-family:inherit;">Get my property results</button>
+      <button onclick="window.__ECHO_WIDGET_OPEN__ ? window.__ECHO_WIDGET_OPEN__() : null" class="btn-cyan" style="border:none;cursor:pointer;font-family:inherit;">Find my workspace →</button>
       <a href="#" class="btn-dark">How it works</a>
     </div>
   </section>
@@ -621,6 +621,15 @@
     </div>
     <div class="footer-copy">© 2025 BeFlex · Demo by DGC</div>
   </footer>
+
+  <!-- Inject starters for the beflex widget — "AI Property Checker" triggers the guided flow -->
+  <script>
+    window.__ECHO_WIDGET_STARTERS__ = [
+      "🔍 AI Property Checker",
+      "📍 Browse offices by city",
+      "💬 Talk to an advisor"
+    ];
+  </script>
 
   <!-- Widget loads config dynamically from Supabase via /widget-config — edit via Vault settings -->
   <script src="/widget.js" data-client-id="beflex"></script>
@@ -849,10 +858,42 @@
       var overlay = document.getElementById('brp-overlay');
       var panel = document.getElementById('brp-panel');
       var nameEl = document.getElementById('brp-header-name');
-      if (leadData && leadData.name) {
-        nameEl.textContent = 'Showing results for ' + leadData.name;
-        nameEl.style.display = 'inline';
+
+      // Reset all filters before applying criteria
+      state.search = '';
+      state.maxBudget = 0;
+      state.amenities = new Set();
+      document.getElementById('brp-search').value = '';
+      document.getElementById('brp-budget').value = '';
+      document.querySelectorAll('.brp-chip').forEach(function (c) { c.classList.remove('active'); });
+
+      // Apply criteria collected from the chat conversation
+      var criteria = (leadData && leadData.criteria) || {};
+      if (criteria.city) {
+        state.search = criteria.city;
+        document.getElementById('brp-search').value = criteria.city;
       }
+      if (criteria.maxBudget) {
+        var budgetSteps = [300, 500, 700, 1000];
+        var matched = budgetSteps.find(function (o) { return o >= criteria.maxBudget; }) || 0;
+        state.maxBudget = matched;
+        document.getElementById('brp-budget').value = matched ? String(matched) : '';
+      }
+      if (criteria.amenities && criteria.amenities.length > 0) {
+        criteria.amenities.forEach(function (a) {
+          state.amenities.add(a);
+          var chip = document.querySelector('.brp-chip[data-amenity="' + a + '"]');
+          if (chip) chip.classList.add('active');
+        });
+      }
+
+      if (leadData && leadData.name) {
+        nameEl.textContent = 'Results for ' + leadData.name;
+        nameEl.style.display = 'inline';
+      } else {
+        nameEl.style.display = 'none';
+      }
+
       overlay.classList.add('brp-show');
       panel.classList.add('brp-open');
       document.body.style.overflow = 'hidden';
