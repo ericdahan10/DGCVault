@@ -2,60 +2,87 @@
   // ── BeFlex-specific CSS ──
   var style = document.createElement("style");
   style.textContent = `
-    /* ── Postcode / budget input step ── */
+    /* ── Text / number input rows ── */
     .pc-input-row {
       display: flex;
       gap: 8px;
-      padding: 8px 12px 10px;
+      padding: 8px 12px 12px;
     }
     .pc-input-row input {
       flex: 1;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
+      min-width: 0;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
       color: inherit;
       font-size: 14px;
       font-family: inherit;
-      padding: 9px 12px;
+      padding: 10px 14px;
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .pc-input-row input:focus {
       border-color: var(--echo-primary, #4a8ac7);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--echo-primary, #4a8ac7) 18%, transparent);
     }
-    .pc-input-row button {
+    .pc-input-row input::placeholder { color: rgba(255,255,255,0.3); }
+    .pc-input-row .pc-btn-primary {
       background: var(--echo-primary, #4a8ac7);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 9px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 16px;
       cursor: pointer;
       white-space: nowrap;
+      transition: opacity 0.15s;
     }
-    .pc-input-row button:hover { opacity: 0.9; }
+    .pc-input-row .pc-btn-primary:hover { opacity: 0.88; }
+    .pc-input-row .pc-btn-skip {
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .pc-input-row .pc-btn-skip:hover {
+      border-color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.7);
+    }
 
     /* ── Amenity checkboxes ── */
     .pc-checkbox-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
       padding: 8px 12px;
     }
     .pc-checkbox-list label {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 9px;
       font-size: 13px;
       cursor: pointer;
-      padding: 6px 8px;
-      border-radius: 7px;
-      transition: background 0.15s;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+      user-select: none;
     }
     .pc-checkbox-list label:hover { background: rgba(255,255,255,0.06); }
+    .pc-checkbox-list label:has(input:checked) {
+      background: color-mix(in srgb, var(--echo-primary, #4a8ac7) 15%, transparent);
+      border-color: color-mix(in srgb, var(--echo-primary, #4a8ac7) 50%, transparent);
+    }
     .pc-checkbox-list input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       accent-color: var(--echo-primary, #4a8ac7);
       cursor: pointer;
       flex-shrink: 0;
@@ -63,24 +90,25 @@
     .pc-continue-btn {
       display: block;
       width: calc(100% - 24px);
-      margin: 4px 12px 10px;
-      padding: 10px;
+      margin: 6px 12px 12px;
+      padding: 11px;
       background: var(--echo-primary, #2d5a8f);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      transition: opacity 0.15s;
     }
-    .pc-continue-btn:hover { opacity: 0.9; }
+    .pc-continue-btn:hover { opacity: 0.88; }
 
-    /* ── Page blur when contact form shows ── */
-    .pc-page-blur > *:not(#echo-widget):not(#echo-launcher) {
-      filter: blur(4px);
+    /* ── Page blur — only fires at contact form step ── */
+    .pc-page-blur > *:not(#echo-widget-root) {
+      filter: blur(5px);
       pointer-events: none;
       user-select: none;
-      transition: filter 0.3s ease;
+      transition: filter 0.35s ease;
     }
   `;
   document.head.appendChild(style);
@@ -107,6 +135,7 @@
         inp.type = "text";
         inp.placeholder = "e.g. EC1A, Manchester, Leeds";
         var btn = document.createElement("button");
+        btn.className = "pc-btn-primary";
         btn.textContent = "Next \u2192";
 
         function submit() {
@@ -153,6 +182,7 @@
           inp.placeholder = "e.g. 500";
           inp.min = "0";
           var btn = document.createElement("button");
+          btn.className = "pc-btn-primary";
           btn.textContent = "Next \u2192";
 
           function submit() {
@@ -167,8 +197,8 @@
           }
 
           var skipBtn = document.createElement("button");
+          skipBtn.className = "pc-btn-skip";
           skipBtn.textContent = "Skip";
-          skipBtn.style.cssText = "background:transparent;border:1px solid rgba(255,255,255,0.2);color:inherit;";
           skipBtn.onclick = function () {
             row.remove();
             pcCriteria.maxBudget = 0;

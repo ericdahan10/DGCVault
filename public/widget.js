@@ -600,6 +600,7 @@
     const brandLine = cfg.brand_line || "AI Assistant";
 
     const wrapper = document.createElement("div");
+    wrapper.id = "echo-widget-root";
     wrapper.innerHTML = `
       <!-- Launcher button -->
       <button id="echo-launcher" aria-label="Open chat">
