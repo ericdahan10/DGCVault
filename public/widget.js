@@ -384,6 +384,41 @@
       .echo-qr-btn:active {
         transform: translateY(0) scale(0.98);
       }
+      /* Selected state for multi-select amenity chips */
+      .echo-qr-btn.pc-selected {
+        background: linear-gradient(135deg, ${primary}55 0%, ${primary}33 100%);
+        border-color: ${primary};
+        border-left-color: ${primary};
+        color: ${isDark ? "#ffffff" : primary};
+        box-shadow: 0 3px 12px ${primary}44, inset 0 1px 0 rgba(255,255,255,0.1);
+      }
+      /* Amenity picker — wrapping row layout */
+      .pc-amenity-picker {
+        display: flex;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 6px;
+        max-width: 90%;
+        align-self: flex-end;
+        padding: 4px 0;
+      }
+      .pc-continue-btn {
+        width: 100%;
+        margin-top: 6px;
+        padding: 10px;
+        background: linear-gradient(135deg, ${primary}, ${primary}cc);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        transition: all 0.15s;
+        box-shadow: 0 3px 10px ${primary}44;
+        font-family: inherit;
+      }
+      .pc-continue-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
       /* ── Inline forms ──────────────────────────────────────────────────── */
       #echo-form-area {
@@ -725,13 +760,36 @@
       options.forEach((opt) => {
         const btn = document.createElement("button");
         btn.className = "echo-qr-btn";
-        // Support both plain strings and {label, message} objects
+        // Support plain strings, {label, message} objects, and {label, action} objects
         const label = String((opt && opt.label) || opt || "").replace(/\s+/g, " ").trim();
         const message = String((opt && opt.message) || opt || "").replace(/\s+/g, " ").trim();
         btn.textContent = label;
         btn.onclick = () => {
           clearQuickReplies();
-          sendMessage(message);
+          if (opt && opt.action === "property_checker") {
+            runPropertyCheckerFlow();
+          } else {
+            sendMessage(message);
+          }
+        };
+        row.appendChild(btn);
+      });
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    // ── Single-select chip helper for PC wizard steps ──
+    function showPcChips(options, callback) {
+      clearQuickReplies();
+      const row = document.createElement("div");
+      row.className = "echo-chip-row echo-user";
+      options.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "echo-qr-btn";
+        btn.textContent = opt;
+        btn.onclick = () => {
+          row.remove();
+          callback(opt);
         };
         row.appendChild(btn);
       });
@@ -799,7 +857,7 @@
 
     // ── Forms ──
 
-    function showContactForm() {
+    function showContactForm(criteriaOverride) {
       clearQuickReplies();
       const formMsg = mountFormAsMessage(`
         <div class="echo-form-shell">
@@ -870,11 +928,118 @@
           console.error("[ECHO] Lead capture failed after 2 attempts.");
         }
         // Fire event so the host page can react (e.g. show a results panel)
-        // Include criteria extracted from the conversation for pre-filtering results
+        // Use explicit PC wizard criteria if available, otherwise parse from chat history
         document.dispatchEvent(new CustomEvent("beflex:lead_captured", {
-          detail: { name, email, phone, client_id: apiClientId, criteria: extractCriteria(chatHistory) }
+          detail: { name, email, phone, client_id: apiClientId, criteria: criteriaOverride || extractCriteria(chatHistory) }
         }));
       };
+    }
+
+    // ── Property Checker Wizard — hardcoded step-by-step criteria collection ──
+
+    var pcCriteria = {};
+
+    function runPropertyCheckerFlow() {
+      clearQuickReplies();
+      clearActiveFormMessage();
+      pcCriteria = {};
+      setTimeout(function () {
+        addMsg("Let's find your perfect workspace!\n\n**Which city are you looking in?**", "bot");
+        showPcChips(
+          ["London", "Manchester", "Bristol", "Leeds", "Birmingham", "Edinburgh"],
+          function (val) {
+            pcCriteria.city = val;
+            addMsg(val, "user");
+            pcAskTeamSize();
+          }
+        );
+      }, 300);
+    }
+
+    function pcAskTeamSize() {
+      setTimeout(function () {
+        addMsg("**How many people need desks?**", "bot");
+        showPcChips(
+          ["1–5 people", "6–10 people", "11–25 people", "26–50 people", "50+ people"],
+          function (val) {
+            pcCriteria.teamSize = val;
+            addMsg(val, "user");
+            pcAskBudget();
+          }
+        );
+      }, 400);
+    }
+
+    function pcAskBudget() {
+      setTimeout(function () {
+        addMsg("**What's your max budget per desk per month?**", "bot");
+        showPcChips(
+          ["Under £300", "Up to £500", "Up to £700", "Up to £1,000", "No limit"],
+          function (val) {
+            pcCriteria.budgetLabel = val;
+            var m = val.match(/£\s*([\d,]+)/);
+            pcCriteria.maxBudget = m ? parseInt(m[1].replace(/,/g, ""), 10) : 0;
+            addMsg(val, "user");
+            pcAskAmenities();
+          }
+        );
+      }, 400);
+    }
+
+    function pcAskAmenities() {
+      setTimeout(function () {
+        addMsg("Any must-have amenities? **Select all that apply**, then tap Continue.", "bot");
+        var amenityList = ["WiFi", "Meeting Rooms", "Gym", "Shower", "Cafe", "24/7 Access", "Bike Storage", "Reception", "Event Space"];
+        var selected = new Set();
+
+        clearQuickReplies();
+        var row = document.createElement("div");
+        row.className = "pc-amenity-picker";
+
+        amenityList.forEach(function (a) {
+          var btn = document.createElement("button");
+          btn.className = "echo-qr-btn";
+          btn.textContent = a;
+          btn.onclick = function () {
+            if (selected.has(a)) {
+              selected.delete(a);
+              btn.classList.remove("pc-selected");
+            } else {
+              selected.add(a);
+              btn.classList.add("pc-selected");
+            }
+          };
+          row.appendChild(btn);
+        });
+
+        var contBtn = document.createElement("button");
+        contBtn.className = "pc-continue-btn";
+        contBtn.textContent = selected.size > 0 ? "Continue →" : "Skip →";
+        contBtn.onclick = function () {
+          row.remove();
+          pcCriteria.amenities = Array.from(selected);
+          var label = pcCriteria.amenities.length > 0
+            ? pcCriteria.amenities.join(", ")
+            : "No specific requirements";
+          addMsg(label, "user");
+          pcAskContact();
+        };
+        // Keep button label updated as selections change
+        row.addEventListener("click", function () {
+          contBtn.textContent = selected.size > 0 ? "Continue →" : "Skip →";
+        });
+        row.appendChild(contBtn);
+
+        messagesEl.appendChild(row);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 400);
+    }
+
+    function pcAskContact() {
+      setTimeout(function () {
+        addMsg("Almost there! 🎉 Pop in your details and I'll show you the matching spaces right now.", "bot");
+        showContactForm(pcCriteria);
+      }, 400);
     }
 
     function showEscalationForm(ticketData = {}) {
