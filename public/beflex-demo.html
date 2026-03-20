@@ -274,6 +274,216 @@
       .locations-grid { grid-template-columns: repeat(2, 1fr); }
       footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px 20px; }
     }
+
+    /* ── BeFlex Results Panel ─────────────────────────────────────────────── */
+    #brp-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 200;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    #brp-overlay.brp-show { opacity: 1; pointer-events: all; }
+
+    #brp-panel {
+      position: fixed;
+      top: 0; right: 0;
+      width: min(880px, 100vw);
+      height: 100dvh;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      z-index: 201;
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow: hidden;
+    }
+    #brp-panel.brp-open { transform: translateX(0); }
+
+    #brp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      flex-shrink: 0;
+    }
+    #brp-header h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 26px; letter-spacing: 0.04em;
+      color: #fff; margin-bottom: 2px;
+    }
+    #brp-header-meta { display: flex; align-items: center; gap: 10px; }
+    #brp-header-count { font-size: 12px; color: var(--muted); }
+    #brp-header-name { font-size: 12px; color: var(--cyan); font-weight: 600; }
+    #brp-close-btn {
+      width: 34px; height: 34px;
+      background: var(--bg3);
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    #brp-close-btn:hover { color: #fff; border-color: #555; }
+
+    #brp-filters {
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    #brp-filter-row1 { display: flex; gap: 10px; }
+    #brp-search, #brp-budget {
+      background: var(--bg3);
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: var(--text);
+      font-size: 13px; font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #brp-search { flex: 1; }
+    #brp-search::placeholder { color: var(--muted); }
+    #brp-search:focus, #brp-budget:focus { border-color: var(--cyan); }
+    #brp-budget { cursor: pointer; }
+    #brp-amenity-filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .brp-chip {
+      font-size: 11px; font-weight: 600;
+      color: var(--muted);
+      background: var(--bg3);
+      border: 1px solid #3a3a3a;
+      padding: 5px 12px; border-radius: 20px;
+      cursor: pointer; transition: all 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .brp-chip:hover { color: var(--text); border-color: #555; }
+    .brp-chip.active { color: #000; background: var(--cyan); border-color: var(--cyan); }
+
+    #brp-grid-wrapper {
+      flex: 1; overflow-y: auto;
+      padding: 22px 28px;
+    }
+    #brp-grid-wrapper::-webkit-scrollbar { width: 4px; }
+    #brp-grid-wrapper::-webkit-scrollbar-track { background: transparent; }
+    #brp-grid-wrapper::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
+
+    #brp-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    #brp-empty {
+      display: none; text-align: center; padding: 60px 24px;
+    }
+    #brp-empty p { color: var(--muted); font-size: 14px; }
+
+    .brp-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .brp-card:hover {
+      border-color: rgba(91,238,250,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .brp-card-img {
+      height: 148px; position: relative; overflow: hidden;
+      background: var(--bg3);
+    }
+    .brp-card-img img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .brp-card-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 22px; letter-spacing: 0.1em; color: #3a3a3a;
+    }
+    .brp-provider-badge {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(4px);
+      color: #fff; font-size: 10px; font-weight: 700;
+      padding: 4px 9px; border-radius: 5px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .brp-card-body { padding: 14px 16px; }
+    .brp-card-name { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px; line-height: 1.3; }
+    .brp-card-area {
+      font-size: 11px; color: var(--muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .brp-card-price {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 28px; letter-spacing: 0.04em;
+      color: var(--cyan); line-height: 1; margin-bottom: 2px;
+    }
+    .brp-card-price-label { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+    .brp-amenity-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 13px; min-height: 22px; }
+    .brp-badge {
+      font-size: 10px; font-weight: 600;
+      color: var(--cyan);
+      background: rgba(91,238,250,0.07);
+      border: 1px solid rgba(91,238,250,0.18);
+      padding: 3px 8px; border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .brp-cta-btn {
+      display: block; width: 100%; text-align: center;
+      background: var(--cyan); color: #000;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 10px; border-radius: 7px; border: none;
+      cursor: pointer; transition: opacity 0.15s; font-family: inherit;
+    }
+    .brp-cta-btn:hover { opacity: 0.85; }
+    .brp-cta-btn.sent {
+      background: var(--bg3); color: var(--cyan);
+      border: 1px solid rgba(91,238,250,0.25); cursor: default;
+    }
+    .brp-strapi-note {
+      text-align: center; padding: 10px 0 0;
+      font-size: 10px; color: #333; letter-spacing: 0.04em;
+    }
+
+    #brp-toast {
+      position: fixed; bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #0f2a1a;
+      border: 1px solid rgba(91,238,250,0.3);
+      color: var(--cyan); font-size: 13px; font-weight: 600;
+      padding: 12px 24px; border-radius: 10px;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+      pointer-events: none; white-space: nowrap;
+    }
+    #brp-toast.show { transform: translateX(-50%) translateY(0); }
+
+    #brp-demo-trigger {
+      position: fixed; bottom: 100px; left: 24px;
+      background: rgba(91,238,250,0.08);
+      border: 1px solid rgba(91,238,250,0.25);
+      color: var(--cyan);
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 9px 16px; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s;
+      z-index: 150; font-family: inherit;
+    }
+    #brp-demo-trigger:hover { background: rgba(91,238,250,0.16); border-color: var(--cyan); }
+
+    @media (max-width: 768px) {
+      #brp-panel { width: 100vw; }
+      #brp-grid { grid-template-columns: 1fr; }
+      #brp-filter-row1 { flex-direction: column; }
+      #brp-demo-trigger { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -303,7 +513,7 @@
       Get matched to an office that suits your criteria, backed by our tech and data.
     </p>
     <div class="hero-actions">
-      <a href="#" class="btn-cyan">Search a location</a>
+      <button onclick="window.brpOpen({name:'',email:'',phone:''})" class="btn-cyan" style="border:none;cursor:pointer;font-family:inherit;">Get my property results</button>
       <a href="#" class="btn-dark">How it works</a>
     </div>
   </section>
@@ -414,6 +624,292 @@
 
   <!-- Widget loads config dynamically from Supabase via /widget-config — edit via Vault settings -->
   <script src="/widget.js" data-client-id="beflex"></script>
+
+  <!-- ── BeFlex Results Panel ──────────────────────────────────────────── -->
+  <div id="brp-overlay"></div>
+
+  <div id="brp-panel" role="dialog" aria-label="Matched workspaces">
+    <div id="brp-header">
+      <div>
+        <h2>Your Matched Spaces</h2>
+        <div id="brp-header-meta">
+          <span id="brp-header-count">Loading...</span>
+          <span id="brp-header-name" style="display:none"></span>
+        </div>
+      </div>
+      <button id="brp-close-btn" aria-label="Close results">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="brp-filters">
+      <div id="brp-filter-row1">
+        <input id="brp-search" type="text" placeholder="Search city or area (e.g. London, Manchester)..." />
+        <select id="brp-budget">
+          <option value="">Any budget</option>
+          <option value="300">Up to £300/desk</option>
+          <option value="500">Up to £500/desk</option>
+          <option value="700">Up to £700/desk</option>
+          <option value="1000">Up to £1,000/desk</option>
+        </select>
+      </div>
+      <div id="brp-amenity-filters">
+        <button class="brp-chip" data-amenity="WiFi">WiFi</button>
+        <button class="brp-chip" data-amenity="24/7 Access">24/7 Access</button>
+        <button class="brp-chip" data-amenity="Gym">Gym</button>
+        <button class="brp-chip" data-amenity="Shower">Shower</button>
+        <button class="brp-chip" data-amenity="Cafe">Cafe</button>
+        <button class="brp-chip" data-amenity="Meeting Rooms">Meeting Rooms</button>
+        <button class="brp-chip" data-amenity="Bike Storage">Bike Storage</button>
+        <button class="brp-chip" data-amenity="Reception">Reception</button>
+        <button class="brp-chip" data-amenity="Event Space">Event Space</button>
+        <button class="brp-chip" data-amenity="Cleaning">Cleaning</button>
+      </div>
+    </div>
+
+    <div id="brp-grid-wrapper">
+      <div id="brp-grid"></div>
+      <div id="brp-empty">
+        <p>No spaces match your current filters.<br>Try adjusting your search or clearing some amenity filters.</p>
+      </div>
+      <p class="brp-strapi-note">STRAPI_INTEGRATION_PLACEHOLDER — swap mock data for live API</p>
+    </div>
+  </div>
+
+  <div id="brp-toast">Viewing request sent — a BeFlex advisor will be in touch!</div>
+
+  <!-- Demo trigger — visible on desktop for sales demos, hidden on mobile -->
+  <button id="brp-demo-trigger">Preview Results</button>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── Mock property data ─────────────────────────────────────────────────
+    // TODO: replace fetchProperties() with a real Strapi API call
+    var MOCK_PROPERTIES = [
+      {
+        id: 1, name: 'WeWork Aldgate Tower', provider: 'WeWork',
+        city: 'London', area: 'Aldgate, E1', price: 650,
+        amenities: ['WiFi', '24/7 Access', 'Cafe', 'Gym', 'Printing', 'Cleaning', 'Reception', 'Meeting Rooms'],
+        img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 2, name: 'FORA Shoreditch', provider: 'FORA',
+        city: 'London', area: 'Shoreditch, E1', price: 720,
+        amenities: ['WiFi', '24/7 Access', 'Shower', 'Bike Storage', 'Cafe', 'Printing', 'Meeting Rooms', 'Event Space'],
+        img: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 3, name: 'Huckletree Mayfair', provider: 'Huckletree',
+        city: 'London', area: 'Mayfair, W1K', price: 850,
+        amenities: ['WiFi', 'Reception', 'Cafe', 'Meeting Rooms', 'Event Space', 'Cleaning', 'Gym'],
+        img: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 4, name: "Canvas King's Cross", provider: 'Canvas',
+        city: 'London', area: "King's Cross, N1C", price: 540,
+        amenities: ['WiFi', '24/7 Access', 'Printing', 'Cafe', 'Meeting Rooms', 'Bike Storage', 'Cleaning'],
+        img: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 5, name: 'Industrious Canary Wharf', provider: 'Industrious',
+        city: 'London', area: 'Canary Wharf, E14', price: 590,
+        amenities: ['WiFi', '24/7 Access', 'Reception', 'Cafe', 'Meeting Rooms', 'Gym', 'Cleaning', 'Printing'],
+        img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 6, name: 'Uncommon Liverpool Street', provider: 'Uncommon',
+        city: 'London', area: 'Liverpool Street, EC2M', price: 700,
+        amenities: ['WiFi', 'Shower', 'Cafe', 'Gym', 'Reception', 'Meeting Rooms', '24/7 Access', 'Cleaning'],
+        img: 'https://images.unsplash.com/photo-1600508774634-4e11d34730e2?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 7, name: 'WeWork No.1 Spinningfields', provider: 'WeWork',
+        city: 'Manchester', area: 'Spinningfields, M3', price: 380,
+        amenities: ['WiFi', '24/7 Access', 'Cafe', 'Meeting Rooms', 'Printing', 'Cleaning', 'Reception'],
+        img: 'https://images.unsplash.com/photo-1577412647305-991150c7d163?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 8, name: 'Work.Life Northern Quarter', provider: 'Work.Life',
+        city: 'Manchester', area: 'Northern Quarter, M4', price: 310,
+        amenities: ['WiFi', 'Cafe', 'Meeting Rooms', 'Event Space', 'Printing', 'Bike Storage'],
+        img: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 9, name: 'Runway East Bristol', provider: 'Runway East',
+        city: 'Bristol', area: 'Clifton, BS1', price: 285,
+        amenities: ['WiFi', '24/7 Access', 'Meeting Rooms', 'Cafe', 'Printing', 'Shower', 'Event Space'],
+        img: 'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 10, name: 'FORA Leeds Central', provider: 'FORA',
+        city: 'Leeds', area: 'City Centre, LS1', price: 345,
+        amenities: ['WiFi', 'Reception', 'Cafe', 'Gym', 'Meeting Rooms', '24/7 Access', 'Cleaning', 'Shower'],
+        img: 'https://images.unsplash.com/photo-1555212697-194d092e3b8f?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 11, name: 'Canvas Birmingham', provider: 'Canvas',
+        city: 'Birmingham', area: 'Brindleyplace, B1', price: 305,
+        amenities: ['WiFi', '24/7 Access', 'Meeting Rooms', 'Printing', 'Cafe', 'Bike Storage'],
+        img: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600&h=400&fit=crop&q=70'
+      },
+      {
+        id: 12, name: 'Huckletree Edinburgh', provider: 'Huckletree',
+        city: 'Edinburgh', area: 'Old Town, EH1', price: 265,
+        amenities: ['WiFi', 'Cafe', 'Meeting Rooms', 'Event Space', 'Reception', 'Printing'],
+        img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop&q=70'
+      }
+    ];
+
+    // ── State ──────────────────────────────────────────────────────────────
+    var state = { search: '', maxBudget: 0, amenities: new Set() };
+    var allProperties = [];
+
+    // ── Strapi placeholder ─────────────────────────────────────────────────
+    // Replace with: fetch(`https://your-strapi/api/properties?populate=*`)
+    async function fetchProperties(criteria) {
+      return MOCK_PROPERTIES;
+    }
+
+    // ── Filter ─────────────────────────────────────────────────────────────
+    function filterProperties(props) {
+      return props.filter(function (p) {
+        if (state.search) {
+          var q = state.search.toLowerCase();
+          if (!p.city.toLowerCase().includes(q) && !p.area.toLowerCase().includes(q)) return false;
+        }
+        if (state.maxBudget && p.price > state.maxBudget) return false;
+        if (state.amenities.size > 0) {
+          for (var a of state.amenities) {
+            if (!p.amenities.includes(a)) return false;
+          }
+        }
+        return true;
+      });
+    }
+
+    // ── Render ─────────────────────────────────────────────────────────────
+    function renderCard(p) {
+      var badgesHtml = p.amenities.slice(0, 4).map(function (a) {
+        return '<span class="brp-badge">' + a + '</span>';
+      }).join('');
+      var imgHtml = p.img
+        ? '<img src="' + p.img + '" alt="' + p.name + '" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=brp-card-img-placeholder>' + p.provider + '</div>\'">'
+        : '<div class="brp-card-img-placeholder">' + p.provider + '</div>';
+      return '<div class="brp-card">'
+        + '<div class="brp-card-img">' + imgHtml
+        + '<span class="brp-provider-badge">' + p.provider + '</span></div>'
+        + '<div class="brp-card-body">'
+        + '<div class="brp-card-name">' + p.name + '</div>'
+        + '<div class="brp-card-area">'
+        + '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'
+        + p.area + '</div>'
+        + '<div class="brp-card-price">£' + p.price.toLocaleString() + '</div>'
+        + '<div class="brp-card-price-label">per desk / month (excl. VAT)</div>'
+        + '<div class="brp-amenity-row">' + badgesHtml + '</div>'
+        + '<button class="brp-cta-btn" data-id="' + p.id + '" data-name="' + p.name + '">Request Viewing</button>'
+        + '</div></div>';
+    }
+
+    function render() {
+      var grid = document.getElementById('brp-grid');
+      var empty = document.getElementById('brp-empty');
+      var count = document.getElementById('brp-header-count');
+      var filtered = filterProperties(allProperties);
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        count.textContent = 'No spaces found';
+      } else {
+        empty.style.display = 'none';
+        grid.innerHTML = filtered.map(renderCard).join('');
+        count.textContent = filtered.length + ' space' + (filtered.length !== 1 ? 's' : '') + ' found';
+        grid.querySelectorAll('.brp-cta-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (btn.classList.contains('sent')) return;
+            btn.classList.add('sent');
+            btn.textContent = 'Request Sent \u2713';
+            showToast(btn.dataset.name);
+          });
+        });
+      }
+    }
+
+    function showToast(spaceName) {
+      var t = document.getElementById('brp-toast');
+      t.classList.add('show');
+      setTimeout(function () { t.classList.remove('show'); }, 3500);
+    }
+
+    // ── Open / close ────────────────────────────────────────────────────────
+    async function brpOpen(leadData) {
+      var overlay = document.getElementById('brp-overlay');
+      var panel = document.getElementById('brp-panel');
+      var nameEl = document.getElementById('brp-header-name');
+      if (leadData && leadData.name) {
+        nameEl.textContent = 'Showing results for ' + leadData.name;
+        nameEl.style.display = 'inline';
+      }
+      overlay.classList.add('brp-show');
+      panel.classList.add('brp-open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('brp-header-count').textContent = 'Loading...';
+      allProperties = await fetchProperties(leadData || {});
+      render();
+    }
+
+    function brpClose() {
+      document.getElementById('brp-overlay').classList.remove('brp-show');
+      document.getElementById('brp-panel').classList.remove('brp-open');
+      document.body.style.overflow = '';
+    }
+
+    window.brpOpen = brpOpen;
+
+    // ── Wire up controls ───────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('brp-close-btn').addEventListener('click', brpClose);
+      document.getElementById('brp-overlay').addEventListener('click', brpClose);
+
+      document.getElementById('brp-search').addEventListener('input', function (e) {
+        state.search = e.target.value.trim();
+        render();
+      });
+
+      document.getElementById('brp-budget').addEventListener('change', function (e) {
+        state.maxBudget = parseInt(e.target.value) || 0;
+        render();
+      });
+
+      document.querySelectorAll('.brp-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var a = chip.dataset.amenity;
+          if (state.amenities.has(a)) {
+            state.amenities.delete(a);
+            chip.classList.remove('active');
+          } else {
+            state.amenities.add(a);
+            chip.classList.add('active');
+          }
+          render();
+        });
+      });
+
+      document.getElementById('brp-demo-trigger').addEventListener('click', function () {
+        brpOpen({ name: 'Demo User', email: 'demo@beflex.co.uk', phone: '' });
+      });
+    });
+
+    // ── Listen for lead captured from widget ───────────────────────────────
+    document.addEventListener('beflex:lead_captured', function (e) {
+      brpOpen(e.detail || {});
+    });
+
+  }());
+  </script>
 
 </body>
 </html>

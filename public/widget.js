@@ -841,6 +841,10 @@
           addMsg(`Thanks ${name}! We've noted your details and will be in touch at ${email}.`, "bot");
           console.error("[ECHO] Lead capture failed after 2 attempts.");
         }
+        // Fire event so the host page can react (e.g. show a results panel)
+        document.dispatchEvent(new CustomEvent("beflex:lead_captured", {
+          detail: { name, email, phone, client_id: apiClientId }
+        }));
       };
     }
 
