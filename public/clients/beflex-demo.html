@@ -465,24 +465,10 @@
     }
     #brp-toast.show { transform: translateX(-50%) translateY(0); }
 
-    #brp-demo-trigger {
-      position: fixed; bottom: 100px; left: 24px;
-      background: rgba(91,238,250,0.08);
-      border: 1px solid rgba(91,238,250,0.25);
-      color: var(--cyan);
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 9px 16px; border-radius: 8px;
-      cursor: pointer; transition: all 0.15s;
-      z-index: 150; font-family: inherit;
-    }
-    #brp-demo-trigger:hover { background: rgba(91,238,250,0.16); border-color: var(--cyan); }
-
     @media (max-width: 768px) {
       #brp-panel { width: 100vw; }
       #brp-grid { grid-template-columns: 1fr; }
       #brp-filter-row1 { flex-direction: column; }
-      #brp-demo-trigger { display: none; }
     }
   </style>
 </head>
@@ -690,8 +676,6 @@
 
   <div id="brp-toast">Viewing request sent — a BeFlex advisor will be in touch!</div>
 
-  <!-- Demo trigger — visible on desktop for sales demos, hidden on mobile -->
-  <button id="brp-demo-trigger">Preview Results</button>
 
   <script>
   (function () {
@@ -940,9 +924,6 @@
         });
       });
 
-      document.getElementById('brp-demo-trigger').addEventListener('click', function () {
-        brpOpen({ name: 'Demo User', email: 'demo@beflex.co.uk', phone: '' });
-      });
     });
 
     // ── Listen for lead captured from widget ───────────────────────────────
