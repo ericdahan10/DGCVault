@@ -26,6 +26,9 @@
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--echo-primary, #4a8ac7) 18%, transparent);
     }
     .pc-input-row input::placeholder { color: rgba(255,255,255,0.3); }
+    .pc-input-row input[type="number"] { -moz-appearance: textfield; }
+    .pc-input-row input[type="number"]::-webkit-outer-spin-button,
+    .pc-input-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     .pc-input-row .pc-btn-primary {
       background: var(--echo-primary, #4a8ac7);
       color: #fff;
@@ -68,35 +71,7 @@
     .pc-budget-field {
       flex: 1;
       min-width: 0;
-      position: relative;
     }
-    .pc-budget-field span {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 13px;
-      color: rgba(255,255,255,0.45);
-      pointer-events: none;
-    }
-    .pc-budget-field input {
-      width: 100%;
-      background: rgba(255,255,255,0.07);
-      border: 1.5px solid rgba(255,255,255,0.14);
-      border-radius: 10px;
-      color: inherit;
-      font-size: 14px;
-      font-family: inherit;
-      padding: 10px 14px 10px 26px;
-      outline: none;
-      box-sizing: border-box;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .pc-budget-field input:focus {
-      border-color: var(--echo-primary, #4a8ac7);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--echo-primary, #4a8ac7) 18%, transparent);
-    }
-    .pc-budget-field input::placeholder { color: rgba(255,255,255,0.3); }
     .pc-budget-label {
       font-size: 10.5px;
       font-weight: 600;
@@ -105,6 +80,40 @@
       letter-spacing: 0.06em;
       margin-bottom: 5px;
     }
+    .pc-budget-input-wrap {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.07);
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 0 12px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .pc-budget-input-wrap:focus-within {
+      border-color: var(--echo-primary, #4a8ac7);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--echo-primary, #4a8ac7) 18%, transparent);
+    }
+    .pc-budget-input-wrap span {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .pc-budget-field input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: 14px;
+      font-family: inherit;
+      padding: 10px 6px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .pc-budget-field input::-webkit-outer-spin-button,
+    .pc-budget-field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .pc-budget-field input::placeholder { color: rgba(255,255,255,0.25); }
     .pc-budget-actions {
       display: flex;
       gap: 8px;
@@ -209,6 +218,55 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
     }
+
+    /* ── Unlock results form — BeFlex override ── */
+    .echo-form-msg .echo-bubble {
+      background: linear-gradient(160deg, rgba(18,32,52,0.98), rgba(10,22,40,0.98)) !important;
+      border: 1px solid rgba(74,138,199,0.35) !important;
+      box-shadow: 0 0 0 1px rgba(74,138,199,0.12), 0 20px 50px rgba(0,0,0,0.5), 0 0 80px rgba(74,138,199,0.08) !important;
+    }
+    .echo-form-title {
+      font-size: 17px !important;
+      letter-spacing: 0.01em !important;
+      text-transform: none !important;
+      margin-bottom: 6px !important;
+    }
+    .echo-form-subtitle {
+      font-size: 13px !important;
+      color: rgba(255,255,255,0.55) !important;
+      margin-bottom: 14px !important;
+      line-height: 1.55 !important;
+    }
+    .echo-inline-form {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 4px 0 0 !important;
+    }
+    .echo-inline-form label {
+      color: rgba(255,255,255,0.4) !important;
+      font-size: 10px !important;
+      letter-spacing: 0.08em !important;
+    }
+    .echo-inline-form input {
+      background: rgba(255,255,255,0.06) !important;
+      border: 1.5px solid rgba(255,255,255,0.12) !important;
+      border-radius: 10px !important;
+      color: #fff !important;
+      font-size: 14px !important;
+      padding: 11px 14px !important;
+    }
+    .echo-inline-form input:focus {
+      border-color: var(--echo-primary, #4a8ac7) !important;
+      background: rgba(74,138,199,0.08) !important;
+    }
+    .echo-btn-primary {
+      padding: 13px !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.02em !important;
+      border-radius: 11px !important;
+    }
   `;
   document.head.appendChild(style);
 
@@ -306,15 +364,18 @@
             var lbl = document.createElement("div");
             lbl.className = "pc-budget-label";
             lbl.textContent = labelText;
+            var wrap = document.createElement("div");
+            wrap.className = "pc-budget-input-wrap";
             var symbol = document.createElement("span");
             symbol.textContent = "\u00a3";
             var inp = document.createElement("input");
             inp.type = "number";
             inp.placeholder = placeholder;
             inp.min = "0";
+            wrap.appendChild(symbol);
+            wrap.appendChild(inp);
             field.appendChild(lbl);
-            field.appendChild(symbol);
-            field.appendChild(inp);
+            field.appendChild(wrap);
             return { field: field, inp: inp };
           }
 
