@@ -633,6 +633,7 @@
 
   <!-- Widget loads config dynamically from Supabase via /widget-config — edit via Vault settings -->
   <script src="/widget.js" data-client-id="beflex"></script>
+  <script src="/clients/beflex.js"></script>
 
   <!-- ── BeFlex Results Panel ──────────────────────────────────────────── -->
   <div id="brp-overlay"></div>
@@ -945,7 +946,7 @@
     });
 
     // ── Listen for lead captured from widget ───────────────────────────────
-    document.addEventListener('beflex:lead_captured', function (e) {
+    document.addEventListener('echo:lead_captured', function (e) {
       brpOpen(e.detail || {});
     });
 
