@@ -6272,7 +6272,7 @@
               starters: ["Tell me more", "How does it work?", "Get in touch"],
             },
           });
-          const demoUrl = `https://vault.dahangroup.io/demo.html?client=${encodeURIComponent(slug)}`;
+          const demoUrl = `https://vault.dahangroup.io/clients/${encodeURIComponent(slug)}-demo.html`;
           fb.innerHTML = `Client registered! <a href="${demoUrl}" target="_blank" style="color:#7db8e8;text-decoration:underline;">Open demo →</a>`;
           fb.style.color = "#4ade80";
           document.getElementById("new-client-name").value = "";
