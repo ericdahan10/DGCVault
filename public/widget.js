@@ -1068,7 +1068,7 @@
 
     // ── Notify client files that the widget is ready ──
     document.dispatchEvent(new CustomEvent("echo:widget_ready", {
-      detail: { client_id: apiClientId }
+      detail: { client_id: clientId, uuid: apiClientId }
     }));
 
     // ── Event listeners ──
